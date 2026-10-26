@@ -1,0 +1,3918 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WSログ｜ワークショップ設計サポートツール</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --main1: #FFB001;
+    --main2: #FFFFEB;
+    --main3: #454545;
+    --main1-light: #FFD06080;
+    --main1-dark: #E09800;
+    --main3-light: #6B6B6B;
+    --main3-lighter: #9B9B9B;
+    --shadow-light: #ffffff;
+    --shadow-dark: #d4d4c4;
+    --good: #90C060;
+    --bad: #E07060;
+  }
+
+  body {
+    background-color: var(--main2);
+    color: var(--main3);
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    min-height: 100vh;
+  }
+
+  .neumorphic {
+    background: var(--main2);
+    border-radius: 16px;
+    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+  }
+
+  .neumorphic-inset {
+    background: var(--main2);
+    border-radius: 12px;
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+  }
+
+  .neumorphic-btn {
+    background: var(--main2);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: var(--main3);
+    font-family: inherit;
+  }
+
+  .neumorphic-btn:active {
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+  }
+
+  .neumorphic-btn.primary {
+    background: var(--main1);
+    box-shadow: 4px 4px 8px #c8880080, -4px -4px 8px #ffd06080;
+    color: white;
+    font-weight: bold;
+  }
+
+  .neumorphic-btn.primary:active {
+    box-shadow: inset 4px 4px 8px #c8880080, inset -4px -4px 8px #ffd06080;
+  }
+
+  .neumorphic-btn.danger { background: var(--bad); color: white; font-weight: bold; box-shadow: 4px 4px 8px #b0404060, -4px -4px 8px var(--shadow-light); }
+  .neumorphic-btn:disabled { opacity: 0.45; cursor: default; }
+
+  .header {
+    background: var(--main2);
+    box-shadow: 0 4px 12px var(--shadow-dark);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+    background: var(--main1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 3px 3px 6px #c8880080, -2px -2px 4px #ffd06080;
+  }
+
+  .header-title { font-size: 18px; font-weight: bold; color: var(--main3); }
+  .header-subtitle { font-size: 11px; color: var(--main3-lighter); margin-top: 1px; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ホーム */
+  .home-hero { padding: 32px; margin-bottom: 24px; text-align: center; }
+  .home-hero h2 { font-size: 22px; color: var(--main1-dark); margin-bottom: 8px; }
+  .home-hero p { font-size: 14px; color: var(--main3-light); line-height: 1.6; }
+  .new-btn { padding: 14px 32px; font-size: 16px; margin-top: 20px; }
+
+  .ws-list { display: grid; gap: 16px; }
+
+  .ws-card { padding: 20px 24px; cursor: pointer; transition: transform 0.15s ease; }
+  .ws-card:hover { transform: translateY(-2px); }
+
+  .ws-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .ws-card-title { font-size: 16px; font-weight: bold; word-break: break-word; }
+  .ws-card-date { font-size: 12px; color: var(--main3-lighter); margin-top: 4px; }
+  .ws-card-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ws-card-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .card-menu-btn { flex-shrink: 0; width: 36px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 10px; }
+
+  .tag {
+    padding: 4px 10px; border-radius: 20px; font-size: 11px;
+    background: var(--main2);
+    box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+    color: var(--main3-light);
+  }
+  .tag.accent { background: var(--main1); color: white; box-shadow: 2px 2px 4px #c8880060; }
+
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; white-space: nowrap; }
+  .status-badge.designing { background: var(--shadow-dark); color: var(--main3-light); }
+  .status-badge.designed { background: #FFB00125; color: var(--main1-dark); border: 1px solid var(--main1); }
+  .status-badge.evaluated { background: var(--main1); color: white; }
+  .status-sub { font-size: 11px; color: var(--main1-dark); }
+  .sample-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; border: 1px dashed var(--main3-lighter); color: var(--main3-light); white-space: nowrap; }
+
+  .score-bar { display: flex; gap: 4px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
+  .score-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .score-dot.good { background: var(--main1); }
+  .score-dot.ok { background: var(--good); }
+  .score-dot.bad { background: var(--bad); }
+  .score-dot.none { background: var(--shadow-dark); }
+  .score-label { font-size: 11px; color: var(--main3-lighter); margin-left: 4px; }
+
+  .section-title {
+    font-size: 13px; font-weight: bold; color: var(--main1-dark);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 16px; padding-left: 4px;
+  }
+
+  /* ステップナビゲーション */
+  .step-nav { display: grid; grid-template-columns: auto repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .step-nav-btn { padding: 9px 6px; font-size: 12px; border-radius: 10px; white-space: nowrap; }
+  .step-nav-btn.is-current { background: var(--main1); color: white; font-weight: bold; box-shadow: inset 3px 3px 6px #c8880080, inset -2px -2px 4px #ffd06080; }
+  .ws-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 20px; padding-left: 4px; }
+  .ws-heading-name { font-size: 18px; font-weight: bold; word-break: break-word; }
+
+  .banner { padding: 14px 16px; border-radius: 12px; font-size: 13px; line-height: 1.6; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+  .banner.info { background: #FFB00118; border: 1px solid #FFB00160; }
+  .banner.warn { background: #E0706014; border: 1px solid #E0706060; color: #8A3030; }
+  .banner .neumorphic-btn { padding: 8px 16px; font-size: 13px; }
+
+  /* フォーム */
+  .form-group { margin-bottom: 20px; }
+  .form-label { font-size: 13px; font-weight: bold; color: var(--main3-light); margin-bottom: 8px; display: block; }
+  .form-note { font-size: 11px; color: var(--main3-lighter); margin-top: 4px; padding-left: 4px; }
+  .form-note.warn { color: #B04040; }
+  .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .form-input {
+    width: 100%; padding: 12px 16px; font-size: 14px;
+    font-family: inherit; color: var(--main3);
+    border: none; outline: none; resize: vertical;
+    background: transparent;
+  }
+  .form-input::placeholder { color: var(--main3-lighter); }
+  select.form-input { -webkit-appearance: none; appearance: none; cursor: pointer; }
+
+  fieldset.plain { border: none; min-width: 0; }
+  fieldset.plain:disabled .neumorphic-inset, fieldset.plain:disabled .neumorphic-btn, fieldset.plain:disabled input[type="range"] { opacity: 0.55; }
+
+  .process-list { display: grid; gap: 16px; margin-bottom: 20px; }
+
+  .process-card { padding: 20px; transition: opacity 0.15s ease; }
+  .process-card.dragging { opacity: 0.4; }
+  .process-card.drag-over { outline: 2px dashed var(--main1); outline-offset: 4px; }
+  .process-card-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .process-card-tools { display: flex; gap: 6px; align-items: center; }
+  .drag-handle { cursor: grab; color: var(--main3-lighter); font-size: 18px; padding: 0 4px; user-select: none; }
+  .icon-btn { width: 34px; height: 32px; font-size: 13px; border-radius: 8px; }
+
+  .process-number {
+    width: 28px; height: 28px; background: var(--main1); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: bold; color: white;
+    box-shadow: 2px 2px 4px #c8880060; flex-shrink: 0;
+  }
+
+  .type-section { margin-bottom: 14px; }
+  .type-row { margin-bottom: 10px; }
+  .type-row:last-child { margin-bottom: 0; }
+
+  .select-group { display: flex; gap: 8px; }
+
+  .select-btn {
+    flex: 1; padding: 9px 4px; font-size: 12px; border-radius: 10px;
+    font-weight: bold; letter-spacing: 0.02em;
+  }
+
+  .select-btn.is-selected {
+    background: var(--main1);
+    color: white;
+    box-shadow: inset 3px 3px 6px #c8880080, inset -2px -2px 4px #ffd06080;
+  }
+
+  .process-fields { display: grid; gap: 12px; margin-bottom: 14px; }
+
+  .fields-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .delete-btn { padding: 6px 12px; font-size: 12px; color: var(--bad); border-radius: 8px; }
+
+  .add-process-btn {
+    width: 100%; padding: 14px; font-size: 14px; border-radius: 12px;
+    border: 2px dashed var(--shadow-dark); background: transparent;
+    color: var(--main3-lighter); cursor: pointer; transition: all 0.15s ease;
+    font-family: inherit;
+  }
+  .add-process-btn:hover { border-color: var(--main1); color: var(--main1); }
+  .add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .design-summary {
+    position: sticky; bottom: 12px; z-index: 50;
+    margin-top: 20px; padding: 12px 16px; font-size: 13px; line-height: 1.6;
+    border-radius: 12px; background: var(--main3); color: white;
+    box-shadow: 4px 4px 12px #00000030;
+  }
+  .design-summary strong { color: var(--main1); }
+
+  /* 評価入力 */
+  .filter-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding: 0 4px; font-size: 13px; }
+  .filter-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .filter-toggle input { width: 18px; height: 18px; accent-color: var(--main1); }
+
+  .eval-card { padding: 20px; margin-bottom: 16px; }
+  .eval-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+  .eval-process-name { font-size: 15px; font-weight: bold; }
+  .eval-aim { font-size: 12px; color: var(--main3-lighter); margin-top: 2px; }
+
+  .eval-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+
+  .eval-option { padding: 10px 8px; font-size: 12px; text-align: center; border-radius: 10px; line-height: 1.4; }
+  .eval-option.selected-good { background: var(--main1); color: white; box-shadow: inset 2px 2px 4px #c8880080; }
+  .eval-option.selected-ok { background: var(--good); color: white; box-shadow: inset 2px 2px 4px #60903080; }
+  .eval-option.selected-bad { background: var(--bad); color: white; box-shadow: inset 2px 2px 4px #b0404080; }
+
+  .eval-field { margin-bottom: 14px; }
+  .inline-input { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--main3-light); }
+  .inline-input .neumorphic-inset { width: 120px; }
+
+  .time-select { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; }
+  .time-select .form-input { padding: 12px 8px; text-align: center; text-align-last: center; }
+  .time-select select:disabled { opacity: 0.4; }
+  .overview-item.wide { grid-column: 1 / -1; }
+
+  .axis-list { display: grid; gap: 8px; margin-bottom: 10px; }
+  .axis-row { display: flex; align-items: center; gap: 8px; }
+  .axis-row .neumorphic-inset { flex: 1; }
+  .axis-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+  .diamond-findings { list-style: none; display: grid; gap: 6px; font-size: 13px; line-height: 1.6; color: var(--main3-light); margin-top: 14px; }
+  .diamond-findings li::before { content: '・'; }
+  .diamond-findings li.lead { font-weight: bold; color: var(--main3); }
+  .diamond-findings li.lead::before { content: ''; }
+  .legend-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .diamond-key { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 12px; color: var(--main3-light); }
+  .diamond-key-item { display: inline-flex; align-items: center; gap: 5px; min-width: 0; word-break: break-word; }
+  .diamond-key-item b { color: var(--main3); }
+  .diamond-key-item .unset { color: var(--main3-lighter); }
+
+  /* タイムテーブル */
+  .timetable { padding: 16px 20px; margin-bottom: 24px; }
+  .tt-note { font-size: 11px; color: var(--main3-lighter); margin-bottom: 10px; }
+  .tt-head, .tt-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 4px 16px; align-items: center; }
+  .tt-compare .tt-head, .tt-compare .tt-row { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); }
+  .tt-head { font-size: 11px; color: var(--main3-lighter); padding: 0 8px 6px; border-bottom: 1px solid var(--shadow-dark); }
+  .tt-row { padding: 8px; border-bottom: 1px solid #d4d4c460; }
+  .tt-row.is-buffer { padding-top: 4px; padding-bottom: 4px; background: #d4d4c425; color: var(--main3-lighter); font-size: 12px; }
+  .tt-row.is-overflow { background: #E0706018; box-shadow: inset 3px 0 0 var(--bad); }
+  .tt-name { min-width: 0; font-size: 13px; font-weight: bold; word-break: break-word; }
+  .tt-row.is-buffer .tt-name { font-weight: normal; padding-left: 12px; }
+  .tt-name .tag { display: inline-block; margin-left: 6px; font-weight: normal; vertical-align: middle; }
+  .tt-cell { min-width: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; align-items: center; font-size: 12px; }
+  .tt-time { font-variant-numeric: tabular-nums; font-weight: bold; color: var(--main3); min-width: 3.2em; }
+  .tt-row.is-buffer .tt-time { font-weight: normal; color: var(--main3-lighter); }
+  .tt-min { font-variant-numeric: tabular-nums; text-align: right; }
+  .tt-bar-track { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: #d4d4c450; overflow: hidden; }
+  .tt-bar { height: 100%; border-radius: 3px; background: var(--main1); }
+  .tt-row.is-buffer .tt-bar { background: #b8b8a8; }
+  .tt-cell.is-filled { opacity: 0.55; }
+  .tt-sub { grid-column: 1 / -1; font-size: 11px; color: var(--main3-lighter); }
+  .tt-sub.warn { color: #B04040; font-weight: bold; }
+  .tt-label { display: none; font-size: 10px; color: var(--main3-lighter); }
+  .tt-foot { display: grid; gap: 4px; padding: 12px 8px 0; font-size: 13px; }
+  .tt-foot strong { color: var(--main1-dark); }
+
+  /* ホームのボタン */
+  .home-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+  .home-actions .new-btn { margin-top: 0; }
+  .home-actions.sub { margin-top: 14px; gap: 10px; }
+
+  /* 一覧の選択と書き出し */
+  .select-toolbar { padding: 14px 18px; margin-bottom: 16px; display: grid; gap: 12px; }
+  .select-toolbar[hidden] { display: none; }
+  .select-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .select-row .toggle-row { margin: 0; }
+  .select-label { font-size: 12px; font-weight: bold; color: var(--main3-light); }
+  .range-inputs { display: flex; align-items: center; gap: 6px; flex: 1 1 260px; min-width: 0; }
+  .range-inputs .neumorphic-inset { flex: 1; min-width: 0; }
+  .range-inputs .form-input { padding: 8px 10px; font-size: 13px; }
+  .select-actions { justify-content: flex-end; }
+  .card-check { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin: -4px 0 0 -6px; flex-shrink: 0; cursor: pointer; }
+  .card-check input { width: 20px; height: 20px; accent-color: var(--main1); cursor: pointer; }
+  .ws-card-title-row { display: flex; align-items: flex-start; gap: 6px; min-width: 0; }
+  .ws-card.is-selected { box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light), inset 0 0 0 2px var(--main1); }
+  .sub-btn { padding: 9px 16px; font-size: 13px; }
+  .list-note { font-size: 12px; color: var(--main3-light); line-height: 1.6; padding-bottom: 10px; border-bottom: 1px solid var(--shadow-dark); }
+
+  /* ナレッジ */
+  .knowledge-nav { grid-template-columns: auto; justify-content: start; }
+  .knowledge-nav .step-nav-btn { padding: 9px 16px; }
+  .knowledge-search { padding: 20px; margin-bottom: 24px; }
+  .search-results { margin-top: 12px; }
+  .search-count { font-size: 12px; color: var(--main3-lighter); margin-bottom: 4px; }
+  .search-result { display: block; width: 100%; text-align: left; background: transparent; border: none; border-top: 1px solid var(--shadow-dark); padding: 12px 4px; cursor: pointer; font-family: inherit; color: inherit; }
+  .search-result:first-of-type { border-top: none; }
+  .search-result:hover { background: #FFB00110; }
+  .search-result-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 13px; }
+  .search-result-head strong { word-break: break-word; }
+  .search-excerpt { font-size: 12px; color: var(--main3-light); line-height: 1.7; margin-top: 4px; word-break: break-word; }
+  .search-excerpt .field { font-size: 10px; color: var(--main1-dark); font-weight: bold; margin-right: 6px; }
+  mark { background: #FFB00160; color: inherit; border-radius: 3px; padding: 0 1px; }
+  .toggle-row { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin: 0 4px 12px; }
+  .toggle-row input { width: 18px; height: 18px; accent-color: var(--main1); }
+
+  .stat-cards { display: grid; gap: 16px; margin-bottom: 16px; }
+  .stat-card { padding: 16px 20px; }
+  .stat-card-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-bottom: 12px; }
+  .stat-card-title { font-weight: bold; font-size: 15px; word-break: break-word; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 16px; }
+  .stat-item dt { font-size: 11px; color: var(--main3-lighter); margin-bottom: 2px; }
+  .stat-item dd { font-size: 14px; font-weight: bold; }
+  .stat-n { font-size: 11px; font-weight: normal; color: var(--main3-lighter); margin-left: 4px; white-space: nowrap; }
+  .weak-tag { display: inline-block; font-size: 10px; font-weight: normal; color: #8A6A00; background: #FFB00125; border-radius: 10px; padding: 1px 8px; margin-left: 4px; white-space: nowrap; }
+  .dist-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--shadow-dark); margin-top: 6px; }
+  .dist-bar span { height: 100%; }
+  .stat-sub-title { font-size: 11px; color: var(--main3-lighter); margin: 14px 0 6px; }
+  .bias-list { display: grid; gap: 4px; font-size: 13px; }
+  .bias-list b { font-weight: bold; }
+  .link-btn { border: none; background: none; color: var(--main1-dark); font-family: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; padding: 0; margin-top: 12px; }
+  .record-list { margin-top: 10px; display: grid; gap: 6px; }
+  .record-list[hidden] { display: none; }
+  .record-row { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 12px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--shadow-dark); cursor: pointer; background: transparent; text-align: left; font-family: inherit; color: inherit; width: 100%; }
+  .record-row:hover { background: #FFB00110; }
+  .engine-note { font-size: 11px; color: var(--main3-lighter); line-height: 1.6; margin: 12px 4px 24px; }
+
+  /* STEP2 参考情報 */
+  .ref-block { padding: 14px 0; border-top: 1px solid var(--shadow-dark); }
+  .ref-block:first-of-type { border-top: none; padding-top: 0; }
+  .ref-title { font-size: 14px; font-weight: bold; margin-bottom: 6px; word-break: break-word; }
+  .ref-title .tag { display: inline-block; margin-left: 6px; font-weight: normal; }
+  .ref-meta { font-size: 12px; color: var(--main3-lighter); }
+  .ref-facts { list-style: none; display: grid; gap: 4px; font-size: 13px; line-height: 1.6; margin-top: 6px; }
+  .ref-facts li::before { content: '●'; color: var(--main1); font-size: 9px; margin-right: 6px; vertical-align: middle; }
+  .ref-quote { font-size: 12px; color: var(--main3-light); border-left: 3px solid var(--main1); padding: 6px 10px; margin-top: 8px; background: #FFB00110; border-radius: 0 8px 8px 0; line-height: 1.6; word-break: break-word; }
+  .ref-quote .ref-meta { display: block; margin-top: 2px; }
+  .ref-quote .link-btn { margin: 0 0 0 6px; font-size: 11px; }
+
+  .manage-list { display: grid; gap: 8px; }
+  .manage-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--shadow-dark); font-size: 14px; }
+  .manage-row span { word-break: break-word; }
+
+  .review-row { display: grid; gap: 8px; padding: 12px; border-radius: 12px; border: 1px solid var(--shadow-dark); margin-bottom: 10px; }
+  .review-row-head { display: flex; gap: 8px; align-items: center; }
+  .review-row-head .neumorphic-inset { flex: 1; }
+  .add-review-btn { padding: 8px 14px; font-size: 12px; border-radius: 10px; }
+
+  /* グラフ */
+  .ux-graph-container { padding: 24px; margin-bottom: 24px; }
+  .graph-legend { display: flex; gap: 8px 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--main3-light); }
+  .legend-line { display: inline-block; width: 20px; border-top-width: 3px; border-top-style: solid; }
+  .legend-line.dashed { border-top-style: dashed; }
+
+  canvas { width: 100%; border-radius: 8px; }
+
+  .pie-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .pie-card { padding: 20px; text-align: center; }
+  .pie-title { font-size: 13px; font-weight: bold; color: var(--main3-light); margin-bottom: 12px; }
+  .pie-canvas { max-width: 160px; margin: 0 auto; display: block; }
+  .pie-legend { margin-top: 12px; font-size: 12px; color: var(--main3-light); }
+
+  /* 概要・比較 */
+  .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px 20px; }
+  .overview-item dt { font-size: 11px; color: var(--main3-lighter); margin-bottom: 2px; }
+  .overview-item dd { font-size: 14px; font-weight: bold; word-break: break-word; }
+
+  .compare-wrap { padding: 20px; margin-bottom: 24px; overflow-x: auto; }
+  .compare-table { width: 100%; min-width: 860px; border-collapse: separate; border-spacing: 0 8px; font-size: 13px; }
+  .compare-table th { padding: 8px 12px; text-align: left; color: var(--main3-lighter); font-weight: normal; font-size: 12px; }
+  .compare-table td { padding: 12px; vertical-align: top; background: var(--main2); box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
+  .compare-table td:first-child { border-radius: 10px 0 0 10px; }
+  .compare-table td:last-child { border-radius: 0 10px 10px 0; }
+  .compare-table td.sub { color: var(--main3-light); font-size: 12px; }
+
+  .compare-cards { display: none; gap: 16px; margin-bottom: 24px; }
+  .compare-card { padding: 16px; }
+  .compare-card-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .compare-card-name { font-weight: bold; font-size: 14px; margin-bottom: 4px; }
+  .compare-card dl { display: grid; gap: 10px; }
+  .compare-card dt { font-size: 11px; color: var(--main3-lighter); margin-bottom: 2px; }
+  .compare-card dd { font-size: 13px; color: var(--main3-light); }
+
+  .time-diff.over { color: #B04040; font-weight: bold; }
+  .time-diff.under { color: #508030; font-weight: bold; }
+  .time-filled { color: var(--main3-lighter); font-size: 11px; }
+
+  .multiline { white-space: pre-wrap; word-break: break-word; }
+  .review-line + .review-line { margin-top: 8px; }
+  .reviewer { display: block; font-size: 10px; font-weight: bold; color: var(--main1-dark); }
+
+  .result-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; white-space: nowrap; }
+  .result-badge.good { background: #FFB00120; color: var(--main1-dark); }
+  .result-badge.ok { background: #90C06020; color: #508030; }
+  .result-badge.bad { background: #E0706020; color: #B04040; }
+  .result-badge.none { background: var(--shadow-dark); color: var(--main3-lighter); }
+
+  .note-block + .note-block { margin-top: 16px; }
+  .note-empty { font-size: 13px; color: var(--main3-lighter); }
+
+  .nav-btns { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; flex-wrap: wrap; }
+  .back-btn { padding: 12px 24px; font-size: 14px; }
+  .next-btn { padding: 12px 28px; font-size: 14px; }
+
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--main3-lighter); }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-text { font-size: 14px; line-height: 1.6; }
+
+  .ux-sliders { display: grid; gap: 12px; }
+  .ux-slider-row { display: grid; grid-template-columns: 56px 1fr 48px; align-items: center; gap: 12px; }
+  .ux-slider-label { font-size: 12px; color: var(--main3-light); text-align: right; }
+  .ux-scale-note { display: grid; grid-template-columns: 56px 1fr 48px; gap: 12px; font-size: 10px; color: var(--main3-lighter); margin-top: -4px; }
+  .ux-scale-note span:nth-child(2) { display: flex; justify-content: space-between; }
+
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 6px;
+    border-radius: 3px; background: var(--shadow-dark); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--main1); cursor: pointer; box-shadow: 2px 2px 4px #c8880060;
+  }
+  .ux-slider-value { font-size: 13px; font-weight: bold; color: var(--main1-dark); text-align: center; }
+  .ux-slider-value button { border: none; background: none; font-family: inherit; font-size: 10px; color: var(--main3-lighter); text-decoration: underline; cursor: pointer; display: block; margin: 2px auto 0; }
+  .ux-slider-row.is-unset input[type="range"] { opacity: 0.4; }
+  .ux-slider-row.is-unset .ux-slider-value { font-size: 11px; font-weight: normal; color: var(--main3-lighter); }
+
+  /* ダイアログ */
+  .modal-backdrop { position: fixed; inset: 0; z-index: 300; background: #45454566; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .modal-backdrop[hidden] { display: none; }
+  .modal { width: 100%; max-width: 440px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 24px; }
+  .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 12px; word-break: break-word; }
+  .modal-body { font-size: 14px; line-height: 1.7; color: var(--main3-light); white-space: pre-wrap; word-break: break-word; }
+  .modal-body:empty { display: none; }
+  .modal-body.has-form { white-space: normal; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; margin-top: 20px; }
+  .modal-actions.stacked { flex-direction: column; }
+  .modal-btn { padding: 11px 20px; font-size: 14px; }
+  .check-list { display: grid; gap: 8px; max-height: 280px; overflow-y: auto; padding: 4px; }
+  .check-row { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; padding: 6px 4px; }
+  .check-row input { width: 18px; height: 18px; accent-color: var(--main1); flex-shrink: 0; }
+  .check-row .tag { margin-left: auto; white-space: nowrap; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    width: max-content; max-width: calc(100% - 32px);
+    padding: 12px 18px; border-radius: 12px;
+    background: var(--main3); color: white; font-size: 13px; line-height: 1.5;
+    box-shadow: 4px 4px 12px #00000030;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 400;
+  }
+  .toast.show { opacity: 1; pointer-events: auto; }
+  .toast.error { background: #B04040; }
+
+  @media (max-width: 600px) {
+    .header { padding: 12px 16px; }
+    .home-hero { padding: 24px 16px; }
+    .home-hero h2 { font-size: 18px; }
+    .fields-row-2 { grid-template-columns: 1fr; }
+    .pie-charts { grid-template-columns: 1fr; }
+    .eval-options { grid-template-columns: 1fr; }
+    .step-nav { grid-template-columns: repeat(4, 1fr); }
+    .step-nav-btn[data-go="home"] { grid-column: 1 / -1; }
+    .process-card, .eval-card { padding: 16px; }
+    .ux-graph-container { padding: 16px; }
+    .compare-wrap { display: none; }
+    .compare-cards { display: grid; }
+    .timetable { padding: 12px; }
+    /* スマホ幅では「予定」「実績」をプロセス名の下に縦に並べる */
+    .tt-compare .tt-head { display: none; }
+    .tt-compare .tt-row { grid-template-columns: 1fr; }
+    .tt-compare .tt-cell { grid-template-columns: 2.4em auto 1fr; }
+    .tt-compare .tt-label { display: block; }
+    .tt-compare .tt-bar-track, .tt-compare .tt-sub { grid-column: 2 / -1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">📋</div>
+  <div>
+    <div class="header-title">WSログ</div>
+    <div class="header-subtitle">ワークショップ設計サポートツール</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ホーム -->
+  <div id="screen-home" class="screen active">
+    <div class="neumorphic home-hero">
+      <h2>プロセスの設計と事後レポートを比較して<br>より効果的なファシリテーションを実現しよう！</h2>
+      <p>事前に設計したプロセスと実際の結果を比較・記録。<br>「このプロセスは効く」という自信を、データで積み上げる。</p>
+      <div class="home-actions">
+        <button class="neumorphic-btn primary new-btn" id="btn-new-ws">＋ 新しいワークショップ</button>
+        <button class="neumorphic-btn new-btn" id="btn-knowledge">📚 ナレッジ</button>
+      </div>
+      <div class="home-actions sub">
+        <button class="neumorphic-btn sub-btn" id="btn-import">⬆ 読み込み（JSON）</button>
+        <button class="neumorphic-btn sub-btn" id="btn-load-samples">🧪 サンプルを読み込む</button>        <input type="file" id="import-file" accept=".json,application/json" hidden>
+      </div>
+    </div>
+    <div class="section-title">ワークショップ一覧</div>
+    <div id="select-toolbar" class="neumorphic select-toolbar">
+      <p class="list-note">データはこのブラウザの中だけに保存されます。別の端末で使うときや、ほかの人と共有するときは、一覧で☑したワークショップを「共有データ出力」で書き出し、そのJSONを読み込んでください。</p>      <div class="select-row">
+        <span class="select-label">状態で絞り込む</span>
+        <label class="toggle-row"><input type="checkbox" data-status-filter="designing" checked>設計中</label>
+        <label class="toggle-row"><input type="checkbox" data-status-filter="designed" checked>設計済み</label>
+        <label class="toggle-row"><input type="checkbox" data-status-filter="evaluated" checked>評価済み</label>
+      </div>
+      <div class="select-row">
+        <label class="toggle-row"><input type="checkbox" id="select-all">すべて選択</label>
+        <span id="select-count" class="stat-n"></span>
+      </div>
+      <div class="select-row">
+        <span class="select-label">開催日で選択</span>
+        <div class="range-inputs">
+          <div class="neumorphic-inset"><input class="form-input" id="range-from" type="date" aria-label="期間の開始日"></div>
+          <span>〜</span>
+          <div class="neumorphic-inset"><input class="form-input" id="range-to" type="date" aria-label="期間の終了日"></div>
+        </div>
+        <button type="button" class="neumorphic-btn sub-btn" id="btn-select-range">この期間を選択</button>
+      </div>
+      <div class="select-row select-actions">
+        <button type="button" class="neumorphic-btn sub-btn" id="btn-clear-selection">選択を解除</button>
+        <button type="button" class="neumorphic-btn danger sub-btn" id="btn-delete-selected">🗑 選択したワークショップを削除</button>
+        <button type="button" class="neumorphic-btn primary sub-btn" id="btn-export-selected">⬇ 共有データ出力</button>
+      </div>
+    </div>
+    <div id="ws-list" class="ws-list"></div>
+  </div>
+
+  <!-- STEP1 事前プロセス設計 -->
+  <div id="screen-step1" class="screen">
+    <div id="step1-header"></div>
+    <div id="step1-banner"></div>
+    <fieldset id="step1-fieldset" class="plain">
+      <div class="section-title">ワークショップ基本情報</div>
+      <div class="neumorphic" style="padding:24px; margin-bottom:24px;">
+        <div class="form-group">
+          <label class="form-label" for="ws-name">ワークショップ名</label>
+          <div class="neumorphic-inset">
+            <input class="form-input" id="ws-name" type="text" placeholder="例：デザイン思考トレーニング">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ws-date">開催日</label>
+          <div class="neumorphic-inset">
+            <input class="form-input" id="ws-date" type="date">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ws-purpose">ワークショップの目的</label>
+          <div class="neumorphic-inset">
+            <textarea class="form-input" id="ws-purpose" rows="2" placeholder="例：新規事業の種となる課題を見つける"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ws-goal">ワークショップのゴール</label>
+          <div class="neumorphic-inset">
+            <textarea class="form-input" id="ws-goal" rows="2" placeholder="例：チームごとに検証したい課題仮説を1つ持ち帰る"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-grid-2">
+            <div>
+              <label class="form-label" for="ws-start-h">開始時刻</label>
+              <div class="time-select">
+                <div class="neumorphic-inset"><select class="form-input" id="ws-start-h" aria-label="開始時刻（時）"></select></div>
+                <span>:</span>
+                <div class="neumorphic-inset"><select class="form-input" id="ws-start-m" aria-label="開始時刻（分）"></select></div>
+              </div>
+            </div>
+            <div>
+              <label class="form-label" for="ws-end-h">終了時刻</label>
+              <div class="time-select">
+                <div class="neumorphic-inset"><select class="form-input" id="ws-end-h" aria-label="終了時刻（時）"></select></div>
+                <span>:</span>
+                <div class="neumorphic-inset"><select class="form-input" id="ws-end-m" aria-label="終了時刻（分）"></select></div>
+              </div>
+            </div>
+          </div>
+          <div id="ws-window-note" class="form-note"></div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="ws-count">参加者人数</label>
+            <div class="neumorphic-inset">
+              <input class="form-input" id="ws-count" type="number" min="0" inputmode="numeric" placeholder="例：16">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ws-composition">参加者の特徴</label>
+            <div class="neumorphic-inset">
+              <input class="form-input" id="ws-composition" type="text" placeholder="例：初対面同士、ワークショップ初参加が多い">
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-label">UXグラフ項目（1〜3項目）</div>
+          <div id="ux-axes-editor" class="axis-list"></div>
+          <button type="button" class="neumorphic-btn add-review-btn" id="btn-add-axis">＋ 項目を追加</button>
+          <div class="form-note">各プロセスで予想し、事後に実際と比べる感情の項目です。</div>
+        </div>
+      </div>
+
+      <div class="section-title">プロセス設計</div>
+      <div id="process-list" class="process-list"></div>
+      <div class="add-row">
+        <button type="button" class="add-process-btn" id="btn-add-process">＋ プロセスを追加</button>
+        <button type="button" class="add-process-btn" id="btn-copy-process">⧉ 過去から複製</button>
+      </div>
+    </fieldset>
+    <div id="design-summary" class="design-summary"></div>
+    <div class="nav-btns">
+      <button class="neumorphic-btn primary next-btn" id="btn-step1-next">STEP2 で確認する →</button>
+    </div>
+  </div>
+
+  <!-- STEP2 プロセス概要確認 -->
+  <div id="screen-step2" class="screen">
+    <div id="step2-header"></div>
+    <div class="section-title">概要</div>
+    <div id="step2-overview" class="neumorphic" style="padding:20px; margin-bottom:24px;"></div>
+
+    <div class="section-title">タイムテーブル</div>
+    <div id="step2-timetable" class="neumorphic timetable"></div>
+
+    <div class="section-title">過去の記録からの参考情報</div>
+    <div id="step2-references" class="neumorphic" style="padding:20px; margin-bottom:24px;"></div>
+
+    <div class="section-title">ダブルダイヤモンド（発散・収束）</div>
+    <div class="neumorphic ux-graph-container">
+      <div class="graph-legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#FFB001;"></span>発散</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#6B6B6B;"></span>収束</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#d4d4c4;"></span>未設定</div>
+      </div>
+      <canvas id="diamond-chart-step2"></canvas>
+      <div class="form-note">横幅はプロセスの時間（バッファ込み）。発散で広がり、収束で閉じます。</div>
+      <div id="diamond-key" class="diamond-key"></div>
+      <ul id="diamond-findings" class="diamond-findings"></ul>
+    </div>
+
+    <div class="section-title">UXグラフ（予想）</div>
+    <div class="neumorphic ux-graph-container">
+      <div class="graph-legend" id="ux-legend-step2"></div>
+      <canvas id="ux-chart-step2"></canvas>
+    </div>
+
+    <div class="section-title">プロセス構成</div>
+    <div class="pie-charts">
+      <div class="neumorphic pie-card">
+        <div class="pie-title">インプット/アウトプット</div>
+        <canvas id="pie-io-step2" class="pie-canvas"></canvas>
+        <div id="pie-io-step2-legend" class="pie-legend"></div>
+      </div>
+      <div class="neumorphic pie-card">
+        <div class="pie-title">個別/全体</div>
+        <canvas id="pie-if-step2" class="pie-canvas"></canvas>
+        <div id="pie-if-step2-legend" class="pie-legend"></div>
+      </div>
+    </div>
+
+    <div id="step2-actions" class="nav-btns"></div>
+  </div>
+
+  <!-- STEP3 事後確認・結果報告 -->
+  <div id="screen-step3" class="screen">
+    <div id="step3-header"></div>
+    <div class="filter-bar">
+      <label class="filter-toggle"><input type="checkbox" id="filter-unevaluated">未評価のみ表示</label>
+      <span id="unevaluated-count" style="color:var(--main3-lighter);"></span>
+    </div>
+    <div id="eval-list"></div>
+    <div class="neumorphic" style="padding:20px; margin-bottom:16px;">
+      <div class="form-group">
+        <label class="form-label" for="overall-note">全体の気づき</label>
+        <div class="neumorphic-inset">
+          <textarea class="form-input" id="overall-note" rows="4" placeholder="ワークショップ全体を振り返って気づいたこと"></textarea>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label" for="next-action-note">次回への改善メモ</label>
+        <div class="neumorphic-inset">
+          <textarea class="form-input" id="next-action-note" rows="3" placeholder="次に設計するときに変えたいこと"></textarea>
+        </div>
+      </div>
+    </div>
+    <div id="step3-actions" class="nav-btns"></div>
+  </div>
+
+  <!-- STEP4 振り返り・結果確認 -->
+  <div id="screen-step4" class="screen">
+    <div id="step4-header"></div>
+    <div class="section-title">結果サマリー</div>
+    <div id="step4-summary" class="neumorphic" style="padding:20px; margin-bottom:24px;"></div>
+
+    <div class="section-title">タイムテーブル（予定／実績）</div>
+    <div id="step4-timetable" class="neumorphic timetable"></div>
+
+    <div class="section-title">UXグラフ（予想＝点線／実際＝実線）</div>
+    <div class="neumorphic ux-graph-container">
+      <div class="graph-legend" id="ux-legend-step4"></div>
+      <canvas id="ux-chart-step4"></canvas>
+    </div>
+
+    <div class="section-title">プロセス構成</div>
+    <div class="pie-charts">
+      <div class="neumorphic pie-card">
+        <div class="pie-title">インプット/アウトプット</div>
+        <canvas id="pie-io-step4" class="pie-canvas"></canvas>
+        <div id="pie-io-step4-legend" class="pie-legend"></div>
+      </div>
+      <div class="neumorphic pie-card">
+        <div class="pie-title">個別/全体</div>
+        <canvas id="pie-if-step4" class="pie-canvas"></canvas>
+        <div id="pie-if-step4-legend" class="pie-legend"></div>
+      </div>
+    </div>
+
+    <div class="section-title">プロセス別 答え合わせ</div>
+    <div class="neumorphic compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>プロセス</th>
+            <th>目的</th>
+            <th>ファシリテーション・介入</th>
+            <th>予想反応</th>
+            <th>結果</th>
+            <th>実績時間</th>
+            <th>振り返り</th>
+            <th>次回メモ</th>
+          </tr>
+        </thead>
+        <tbody id="compare-tbody"></tbody>
+      </table>
+    </div>
+    <div id="compare-cards" class="compare-cards"></div>
+
+    <div id="step4-notes" class="neumorphic" style="padding:20px; margin-bottom:24px;"></div>
+
+    <div class="nav-btns">
+      <button class="neumorphic-btn back-btn" id="btn-step4-edit">← 評価を修正する</button>
+      <button class="neumorphic-btn primary next-btn" id="btn-step4-home">ホームへ</button>
+    </div>
+  </div>
+
+  <!-- ナレッジ（横断） -->
+  <div id="screen-knowledge" class="screen">
+    <nav class="step-nav knowledge-nav" aria-label="移動">
+      <button type="button" class="neumorphic-btn step-nav-btn" id="btn-knowledge-home">← ホーム</button>
+    </nav>
+    <div class="ws-heading"><span class="ws-heading-name">ナレッジ（過去の記録を横断）</span></div>
+
+    <div class="section-title">キーワード検索</div>
+    <div class="neumorphic knowledge-search">
+      <div class="neumorphic-inset">
+        <input class="form-input" id="knowledge-search" type="search" placeholder="例：バッファ 資材" aria-label="キーワード">
+      </div>
+      <div id="search-results" class="search-results"></div>
+    </div>
+
+    <label class="toggle-row"><input type="checkbox" id="toggle-samples">サンプルを集計に含める</label>
+    <div id="knowledge-banner"></div>
+    <div id="knowledge-summary" class="form-note" style="margin:0 4px 20px; font-size:13px;"></div>
+
+    <div class="section-title">予想のクセ（全体）</div>
+    <div id="knowledge-bias" class="neumorphic stat-card" style="margin-bottom:24px;"></div>
+
+    <div class="section-title">種別ごとの集計</div>
+    <div id="knowledge-categories" class="stat-cards"></div>
+
+    <div class="engine-note" id="knowledge-limit"></div>
+  </div>
+
+</div>
+
+<div id="modal-root" class="modal-backdrop" hidden>
+  <div class="modal neumorphic" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body"></div>
+    <div class="modal-actions"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ===== 設定 =====
+const CONFIG = {
+  storageKey: 'wslog.v2',
+  legacyStorageKey: 'wslog_workshops',   // デモ版のキー（変換後も復旧用に残す）
+  autosaveDelayMs: 500,
+  minReliableN: 3,                       // これ未満は「参考（件数が少ない）」
+  // STEP2の参考情報（7-6）の閾値
+  rules: {
+    r1MinN: 2, r1WorseRate: 0.5,
+    r2MinN: 2, r2OverMinutes: 3,
+    r3MinN: 2, r3MaxUseRate: 0.3,
+    r4MinN: 3, r4MinAbsBias: 0.7,
+    r5MaxExcerpts: 3,
+  },
+};
+
+const SCHEMA_VERSION = 2;
+const DEFAULT_CATEGORIES = ['準備', 'アイスブレイク', 'アイデア発想', 'アイデア共有'];
+// 以前の初期リスト。保存済みのリストがこれと同じなら、利用者が手を加えていないとみなして新しい初期リストに置き換える
+const PREVIOUS_DEFAULT_CATEGORIES = ['準備', 'アイスブレイク', '全体共有', 'ワーク'];
+// UXグラフ項目はワークショップごとに名前・数（1〜3）を変えられる。新規作成時は DEFAULT_UX_AXES。
+// 項目の情報を持たないデータ（デモ版・v2.1形式）は、2番目の値が「不安感」なので LEGACY_UX_AXES で読む
+const DEFAULT_UX_AXES = [
+  { id: 'expectation', label: '期待感' },
+  { id: 'achievement', label: '達成感' },
+  { id: 'tension',     label: '緊張感' },
+];
+const LEGACY_UX_AXES = [
+  { id: 'expectation', label: '期待感' },
+  { id: 'anxiety',     label: '不安感' },
+  { id: 'tension',     label: '緊張感' },
+];
+const UX_AXES_MIN = 1;
+const UX_AXES_MAX = 3;
+const UX_COLORS = ['#FFB001', '#E07060', '#90C060'];   // 項目の並び順で割り当てる
+const RESULT_VALUES = ['better', 'as_expected', 'worse'];
+const WORK_TYPES    = ['input', 'output'];
+const FORMATS       = ['individual', 'group'];
+const PHASES        = ['diverge', 'converge'];       // ダブルダイヤモンドの展開
+const STATUSES      = ['designing', 'designed', 'evaluated'];
+const SAMPLE_TYPES  = ['anonymized', 'fictional'];
+const DEFAULT_REVIEWER = '自分';
+
+const STATUS_LABELS   = { designing: '設計中', designed: '設計済み', evaluated: '評価済み' };
+const SAMPLE_LABELS   = { anonymized: 'サンプル（実データ由来）', fictional: 'サンプル（架空）' };
+const WORK_TYPE_LABELS = { input: 'インプット', output: 'アウトプット', '': '-' };
+const FORMAT_LABELS    = { individual: '個別', group: '全体', '': '-' };
+const PHASE_LABELS     = { diverge: '発散', converge: '収束', '': '未設定' };
+const PHASE_COLORS     = { diverge: '#FFB001', converge: '#6B6B6B', '': '#d4d4c4' };
+const RESULT_DISPLAY = {
+  'better':      ['ok',   '📈 予想より良かった'],
+  'as_expected': ['good', '✅ 予想通り'],
+  'worse':       ['bad',  '📉 予想より悪かった'],
+  '':            ['none', '未評価'],
+};
+const STEPS = [
+  { screen: 'step1', label: '1 設計' },
+  { screen: 'step2', label: '2 確認' },
+  { screen: 'step3', label: '3 結果入力' },
+  { screen: 'step4', label: '4 振り返り' },
+];
+
+// ===== ユーティリティ =====
+const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+
+// 画面に出す文字列は必ずこれを通す（読み込んだJSONは他人が作ったものかもしれないため）
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ESC_MAP[c]);
+}
+
+function newId() {
+  if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = Array.from(b, x => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
+function nowIso() { return new Date().toISOString(); }
+function deepCopy(obj) { return JSON.parse(JSON.stringify(obj)); }
+function isPlainObject(v) { return v !== null && typeof v === 'object' && !Array.isArray(v); }
+
+function str(v) {
+  if (typeof v === 'string') return v;
+  if (typeof v === 'number' && Number.isFinite(v)) return String(v);
+  return '';
+}
+
+function oneOf(v, allowed, fallback) { return allowed.includes(v) ? v : fallback; }
+
+function toNumber(v) {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  if (typeof v === 'string' && v.trim() !== '') {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+function nonNegInt(v, fallback) {
+  const n = toNumber(v);
+  return n === null || n < 0 ? fallback : Math.round(n);
+}
+
+function uxValue(v, fallback) {
+  return typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 5 ? v : fallback;
+}
+
+function isoOr(v, fallback) {
+  return typeof v === 'string' && !Number.isNaN(Date.parse(v)) ? v : fallback;
+}
+
+// "HH:MM" → 0時からの分。未設定・不正は null
+function parseClock(s) {
+  const m = /^(\d{2}):(\d{2})$/.exec(s || '');
+  return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+}
+
+function formatClock(minutes) {
+  const day = Math.floor(minutes / 1440);
+  const m = ((minutes % 1440) + 1440) % 1440;
+  return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}${day > 0 ? '（翌日）' : ''}`;
+}
+
+function formatMinutes(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}分`;
+  return m === 0 ? `${h}時間` : `${h}時間${m}分`;
+}
+
+let toastTimer = null;
+function notify(message, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = message;
+  el.className = 'toast show' + (type === 'error' ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, type === 'error' ? 8000 : 3000);
+}
+document.getElementById('toast').addEventListener('click', e => { e.currentTarget.className = 'toast'; });
+
+// ===== ダイアログ =====
+// confirm()/prompt() は Safari で抑止されることがあり見た目もそろわないため、自前のモーダルを使う
+let modalResolve = null;
+
+function openModal({ title, body = '', actions, stacked = false }) {
+  closeModal(null);
+  const root = document.getElementById('modal-root');
+  root.querySelector('.modal-title').textContent = title;
+  const bodyEl = root.querySelector('.modal-body');
+  bodyEl.innerHTML = '';
+  bodyEl.classList.toggle('has-form', typeof body !== 'string');
+  if (typeof body === 'string') bodyEl.textContent = body;
+  else bodyEl.appendChild(body);
+
+  const actionsEl = root.querySelector('.modal-actions');
+  actionsEl.innerHTML = '';
+  actionsEl.classList.toggle('stacked', stacked);
+  actions.forEach(a => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'neumorphic-btn modal-btn' + (a.kind ? ' ' + a.kind : '');
+    btn.textContent = a.label;
+    if (a.kind) btn.dataset.kind = a.kind;
+    btn.addEventListener('click', () => closeModal(typeof a.value === 'function' ? a.value() : a.value));
+    actionsEl.appendChild(btn);
+  });
+
+  root.hidden = false;
+  const focusTarget = bodyEl.querySelector('input, select') || actionsEl.querySelector('[data-kind]') || actionsEl.lastElementChild;
+  if (focusTarget) focusTarget.focus();
+  return new Promise(resolve => { modalResolve = resolve; });
+}
+
+function closeModal(value) {
+  const root = document.getElementById('modal-root');
+  if (root.hidden) return;
+  root.hidden = true;
+  const resolve = modalResolve;
+  modalResolve = null;
+  if (resolve) resolve(value);
+}
+
+document.getElementById('modal-root').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal(null);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal(null);
+});
+
+async function confirmDialog(message, { title = '確認', okLabel = 'OK', danger = false } = {}) {
+  const result = await openModal({
+    title,
+    body: message,
+    actions: [
+      { label: 'キャンセル', value: false },
+      { label: okLabel, value: true, kind: danger ? 'danger' : 'primary' },
+    ],
+  });
+  return result === true;
+}
+
+async function promptDialog(title, { placeholder = '', okLabel = 'OK' } = {}) {
+  const body = document.createElement('div');
+  body.innerHTML = `<div class="neumorphic-inset"><input class="form-input" type="text"></div>`;
+  const input = body.querySelector('input');
+  input.placeholder = placeholder;
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.isComposing) closeModal(input.value);
+  });
+  const result = await openModal({
+    title,
+    body,
+    actions: [
+      { label: 'キャンセル', value: null },
+      { label: okLabel, value: () => input.value, kind: 'primary' },
+    ],
+  });
+  return result === null ? null : result.trim();
+}
+
+// ===== モデル =====
+function createEmptyAppData() {
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    workshops: [],
+    categories: DEFAULT_CATEGORIES.slice(),
+    settings: { includeSamplesInStats: true },
+  };
+}
+
+function createWorkshop() {
+  const now = nowIso();
+  return {
+    id: newId(),
+    schemaVersion: SCHEMA_VERSION,
+    name: '',
+    date: '',
+    purpose: '',
+    goal: '',
+    startTime: '',
+    endTime: '',
+    participantCount: null,
+    participantComposition: '',     // 画面上の名称は「参加者の特徴」
+    uxAxes: deepCopy(DEFAULT_UX_AXES),
+    status: 'designing',
+    overallNote: '',
+    nextActionNote: '',
+    isSample: false,
+    sampleType: null,
+    createdAt: now,
+    updatedAt: now,
+    processes: [],
+  };
+}
+
+function uxMap(axes, value) {
+  return Object.fromEntries(axes.map(a => [a.id, value]));
+}
+
+function axisLabel(axis, index) {
+  return axis.label.trim() || `項目${index + 1}`;
+}
+
+function createEmptyEvaluation(axes) {
+  return {
+    result: '',
+    actualDuration: null,
+    actualReaction: '',
+    uxActual: uxMap(axes, null),
+    reviews: [],
+    nextMemo: '',
+  };
+}
+
+function createProcess(order, axes) {
+  return {
+    id: newId(),
+    order,
+    name: '',
+    category: '',
+    workType: '',
+    format: '',
+    phase: '',
+    aim: '',
+    intervention: '',
+    expectedReaction: '',
+    duration: 10,
+    bufferAfter: 0,
+    uxExpected: uxMap(axes, 3),
+    evaluation: createEmptyEvaluation(axes),
+  };
+}
+
+// 設計項目だけを写し、評価は空にする（プロセス複製・ワークショップ複製で共通）。
+// UX予想は、複製先に同じ名前の項目があればその値を引き継ぎ、なければ初期値3にする
+function copyProcessDesign(src, srcAxes, dstAxes) {
+  const p = deepCopy(src);
+  p.id = newId();
+  p.uxExpected = Object.fromEntries(dstAxes.map(dst => {
+    const match = srcAxes.find(a => a.id === dst.id && a.label === dst.label) || srcAxes.find(a => a.label.trim() !== '' && a.label === dst.label);
+    return [dst.id, match ? src.uxExpected[match.id] ?? 3 : 3];
+  }));
+  p.evaluation = createEmptyEvaluation(dstAxes);
+  return p;
+}
+
+function duplicateWorkshop(src) {
+  const now = nowIso();
+  const ws = deepCopy(src);
+  Object.assign(ws, {
+    id: newId(),
+    name: src.name + '（コピー）',
+    status: 'designing',
+    overallNote: '',
+    nextActionNote: '',
+    isSample: false,
+    sampleType: null,
+    createdAt: now,
+    updatedAt: now,
+    processes: src.processes.map(p => copyProcessDesign(p, src.uxAxes, ws.uxAxes)),
+  });
+  return ws;
+}
+
+function renumber(ws) {
+  ws.processes.forEach((p, i) => { p.order = i + 1; });
+}
+
+function hasEvaluationInput(p) {
+  const ev = p.evaluation;
+  return ev.result !== '' || ev.actualDuration !== null || ev.reviews.some(r => r.note.trim() !== '');
+}
+
+// 「評価途中」は保存せず、その都度判定する（6章）
+function isEvaluationInProgress(ws) {
+  return ws.status === 'designed' && ws.processes.some(hasEvaluationInput);
+}
+
+function countUnevaluated(ws) {
+  return ws.processes.filter(p => p.evaluation.result === '').length;
+}
+
+function totalPlannedMinutes(ws) {
+  return ws.processes.reduce((sum, p) => sum + p.duration + p.bufferAfter, 0);
+}
+
+// プロセスを積み上げた終了見込み。開始時刻が未設定なら 0:00 起点の経過時間で返す
+function plannedEndLabel(ws) {
+  const start = parseClock(ws.startTime);
+  const total = totalPlannedMinutes(ws);
+  return start === null ? `0:00起点で ${formatClock(total)}` : formatClock(start + total);
+}
+
+// 基本情報の開始〜終了時刻から求めた、予定の実施時間（分）。終了が開始より前なら翌日とみなす
+function scheduledWindowMinutes(ws) {
+  const start = parseClock(ws.startTime);
+  const end = parseClock(ws.endTime);
+  if (start === null || end === null || start === end) return null;
+  return end > start ? end - start : end + 1440 - start;
+}
+
+// 予定の実施時間とプロセス合計の比較文（どちらかが分からなければ空）
+function windowFitLabel(ws) {
+  const win = scheduledWindowMinutes(ws);
+  if (win === null) return '';
+  const diff = win - totalPlannedMinutes(ws);
+  if (diff === 0) return '予定の時間ちょうどです';
+  return diff > 0 ? `予定まであと${formatMinutes(diff)}の余裕があります` : `予定を${formatMinutes(-diff)}超えています`;
+}
+
+function scheduledRangeLabel(ws) {
+  const win = scheduledWindowMinutes(ws);
+  if (win !== null) return `${ws.startTime}〜${ws.endTime}（${formatMinutes(win)}）`;
+  if (ws.startTime) return `${ws.startTime}〜（終了時刻未設定）`;
+  if (ws.endTime) return `〜${ws.endTime}（開始時刻未設定）`;
+  return '未設定';
+}
+
+// ===== タイムテーブル（5-6） =====
+// 予定と実績の行を累積で計算する。開始時刻が未設定なら 0:00 起点。
+// 実績のルール:
+//   - プロセス: 実績時間。未入力なら予定時間で補う（filled）
+//   - バッファ: 超過分（実績−予定、0以上）を差し引いた残り。短縮した場合はバッファを予定どおり残す
+//   - 超過分がバッファを上回った分（overflow）だけ、以降の時刻が後ろにずれる
+function buildTimetable(ws) {
+  const start = parseClock(ws.startTime);
+  const base = start ?? 0;
+  let planT = base;
+  let actualT = base;
+  const rows = [];
+
+  ws.processes.forEach((p, i) => {
+    const filled = p.evaluation.actualDuration === null;
+    const actualMinutes = filled ? p.duration : p.evaluation.actualDuration;
+    const over = Math.max(actualMinutes - p.duration, 0);
+
+    rows.push({
+      kind: 'process',
+      index: i,
+      process: p,
+      plan: { start: planT, minutes: p.duration },
+      actual: { start: actualT, minutes: actualMinutes, filled },
+      diff: actualMinutes - p.duration,
+      // バッファがないプロセスの超過は、そのまま以降のずれになる
+      overflow: p.bufferAfter === 0 ? over : 0,
+    });
+    planT += p.duration;
+    actualT += actualMinutes;
+
+    if (p.bufferAfter > 0) {
+      const remaining = Math.max(p.bufferAfter - over, 0);
+      rows.push({
+        kind: 'buffer',
+        index: i,
+        process: p,
+        plan: { start: planT, minutes: p.bufferAfter },
+        actual: { start: actualT, minutes: remaining, filled },
+        used: Math.min(over, p.bufferAfter),
+        overflow: Math.max(over - p.bufferAfter, 0),
+      });
+      planT += p.bufferAfter;
+      actualT += remaining;
+    }
+  });
+
+  return {
+    hasStart: start !== null,
+    rows,
+    plan:   { total: planT - base, end: planT },
+    actual: { total: actualT - base, end: actualT },
+    filledCount: ws.processes.filter(p => p.evaluation.actualDuration === null).length,
+  };
+}
+
+// ===== ダブルダイヤモンドの判定 =====
+// 展開が設定されたプロセスを順に見て、同じ展開が続く部分を1つのまとまりにする。
+// 判定は並びの事実だけを返し、良し悪しは書かない（4章の設計思想）
+function analyzeDiamond(ws) {
+  const runs = [];
+  ws.processes.forEach((p, i) => {
+    if (!p.phase) return;
+    const minutes = p.duration + p.bufferAfter;
+    const last = runs[runs.length - 1];
+    if (last && last.phase === p.phase) {
+      last.minutes += minutes;
+      last.to = i;
+    } else {
+      runs.push({ phase: p.phase, minutes, from: i, to: i });
+    }
+  });
+  const pattern = runs.map(r => r.phase);
+  const diamonds = pattern.filter((ph, i) => ph === 'diverge' && pattern[i + 1] === 'converge').length;
+  const minutesOf = phase => ws.processes.filter(p => p.phase === phase).reduce((s, p) => s + p.duration + p.bufferAfter, 0);
+  return {
+    runs,
+    diamonds,
+    isDoubleDiamond: pattern.join(',') === 'diverge,converge,diverge,converge',
+    startsWithConverge: pattern[0] === 'converge',
+    endsWithDiverge: pattern[pattern.length - 1] === 'diverge',
+    divergeMinutes: minutesOf('diverge'),
+    convergeMinutes: minutesOf('converge'),
+  };
+}
+
+// ===== 計算エンジン（7章） =====
+// すべてブラウザ内で決定的に計算する。外部通信なし。結果には必ず件数（N）と根拠を添える
+const ENGINE_LIMIT_NOTE = '集計は「何が起きたか」を示すもので、「なぜか」は示しません。理由は振り返りの文章を読んで判断してください。';
+const UNSET_CATEGORY_LABEL = '種別未設定';
+
+// 全角／半角・大文字／小文字をそろえる（NFKC＋小文字化）
+function normalizeText(s) { return String(s ?? '').normalize('NFKC').toLowerCase(); }
+function labelKey(s) { return normalizeText(s).trim(); }
+const mean = xs => xs.reduce((a, b) => a + b, 0) / xs.length;
+const clamp01 = x => Math.min(1, Math.max(0, x));
+
+// 7-0 集計の対象: 評価済みのワークショップ。設定によりサンプルを除き、STEP2では設計中の自身を除く
+function statsWorkshops(excludeId = null) {
+  return appData.workshops.filter(w =>
+    w.status === 'evaluated' &&
+    w.id !== excludeId &&
+    (appData.settings.includeSamplesInStats || !w.isSample));
+}
+
+function processRecords(workshops) {
+  return workshops.flatMap(ws => ws.processes.map(p => ({ ws, p })));
+}
+
+// 7-1 結果の分布 ／ 7-3 時間とバッファ。N は各指標の計算に実際に使ったプロセス数
+function summarizeRecords(records) {
+  const withResult = records.filter(r => r.p.evaluation.result !== '');
+  const dist = { better: 0, as_expected: 0, worse: 0 };
+  withResult.forEach(r => { dist[r.p.evaluation.result]++; });
+  const timed = records.filter(r => r.p.evaluation.actualDuration !== null);
+  const buffered = timed.filter(r => r.p.bufferAfter > 0);
+  return {
+    total: records.length,
+    workshopCount: new Set(records.map(r => r.ws.id)).size,
+    resultN: withResult.length,
+    dist,
+    timeN: timed.length,
+    overAvg: timed.length ? mean(timed.map(r => r.p.evaluation.actualDuration - r.p.duration)) : null,
+    bufferN: buffered.length,
+    bufferUse: buffered.length
+      ? mean(buffered.map(r => clamp01(Math.max(r.p.evaluation.actualDuration - r.p.duration, 0) / r.p.bufferAfter)))
+      : null,
+  };
+}
+
+// 7-2 予想のクセ（実際 − 予想の平均）。正の値は「実際のほうが高かった」。
+// UXグラフ項目はワークショップごとに違うため、項目名（正規化）で突き合わせる。名前のない項目は除く
+function uxBias(records) {
+  const groups = new Map();
+  records.forEach(({ ws, p }) => {
+    ws.uxAxes.forEach(axis => {
+      const key = labelKey(axis.label);
+      const actual = p.evaluation.uxActual[axis.id];
+      if (!key || actual === null || actual === undefined) return;
+      if (!groups.has(key)) groups.set(key, { label: axis.label.trim(), diffs: [] });
+      groups.get(key).diffs.push(actual - p.uxExpected[axis.id]);
+    });
+  });
+  return Array.from(groups.entries(), ([key, g]) => ({ key, label: g.label, n: g.diffs.length, mean: mean(g.diffs) }));
+}
+
+// 種別ごとの集計。並びは選択肢の順 → 選択肢にない種別（名前順） → 種別未設定
+function categoryStats(workshops) {
+  const byCategory = new Map();
+  processRecords(workshops).forEach(r => {
+    const key = r.p.category.trim();
+    if (!byCategory.has(key)) byCategory.set(key, []);
+    byCategory.get(key).push(r);
+  });
+  const rank = c => c === '' ? Infinity : (appData.categories.includes(c) ? appData.categories.indexOf(c) : appData.categories.length);
+  return Array.from(byCategory.entries(), ([category, records]) => ({
+    category,
+    records,
+    summary: summarizeRecords(records),
+    bias: uxBias(records),
+  })).sort((a, b) => rank(a.category) - rank(b.category) || a.category.localeCompare(b.category, 'ja'));
+}
+
+// 開催日の新しい順（未入力は後ろ）
+function compareByDateDesc(a, b) {
+  if (!a.date !== !b.date) return a.date ? -1 : 1;
+  if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+  return a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0;
+}
+
+const fmt1 = x => (Math.round(x * 10) / 10).toFixed(1);
+const fmtPct = x => `${Math.round(x * 100)}%`;
+
+// 7-6 STEP2の参考情報。同じ種別の過去データに対して R1〜R5 を判定し、事実の提示にとどめる
+function pastReferenceFor(p, ws) {
+  const category = p.category.trim();
+  if (!category) return { state: 'no-category' };
+  const records = processRecords(statsWorkshops(ws.id)).filter(r => r.p.category.trim() === category);
+  if (records.length === 0) return { state: 'no-data' };
+
+  const R = CONFIG.rules;
+  const s = summarizeRecords(records);
+  const facts = [];
+  if (s.resultN >= R.r1MinN && s.dist.worse / s.resultN >= R.r1WorseRate) {
+    facts.push({ rule: 'R1', text: `同じ種別は過去${s.resultN}回中${s.dist.worse}回、予想より悪かった` });
+  }
+  if (s.timeN >= R.r2MinN && s.overAvg >= R.r2OverMinutes) {
+    facts.push({ rule: 'R2', text: `過去は予定より平均+${fmt1(s.overAvg)}分かかっています（${s.timeN}件）` });
+  }
+  if (s.bufferN >= R.r3MinN && s.bufferUse < R.r3MaxUseRate) {
+    facts.push({ rule: 'R3', text: `過去のバッファは平均${fmtPct(s.bufferUse)}しか使われていません（${s.bufferN}件）` });
+  }
+  const bias = uxBias(records);
+  ws.uxAxes.forEach(axis => {
+    const b = bias.find(x => x.key === labelKey(axis.label));
+    if (b && b.n >= R.r4MinN && Math.abs(b.mean) >= R.r4MinAbsBias) {
+      facts.push({ rule: 'R4', text: `${b.label}は、実際のほうが平均${fmt1(Math.abs(b.mean))}${b.mean > 0 ? '高い' : '低い'}傾向があります（${b.n}件）` });
+    }
+  });
+
+  const excerpts = records
+    .flatMap(r => r.p.evaluation.reviews
+      .filter(rv => rv.note.trim() !== '')
+      .map(rv => ({ ws: r.ws, p: r.p, reviewer: rv.reviewer, note: rv.note.trim() })))
+    .sort((a, b) => compareByDateDesc(a.ws, b.ws))
+    .slice(0, R.r5MaxExcerpts);
+
+  return { state: 'ok', category, count: s.total, workshopCount: s.workshopCount, facts, excerpts };
+}
+
+// ===== キーワード検索（7-5） =====
+function searchTerms(query) {
+  return Array.from(new Set(normalizeText(query).split(/\s+/).filter(Boolean)));
+}
+
+// 検索の単位は「プロセス」と「ワークショップ全体の記述」。状態を問わず全ワークショップが対象
+function searchDocuments() {
+  return appData.workshops
+    .filter(w => appData.settings.includeSamplesInStats || !w.isSample)
+    .flatMap(ws => [
+      {
+        ws, p: null,
+        fields: [
+          ['ワークショップの目的', ws.purpose],
+          ['ワークショップのゴール', ws.goal],
+          ['全体の気づき', ws.overallNote],
+          ['次回への改善メモ', ws.nextActionNote],
+        ],
+      },
+      ...ws.processes.map(p => ({
+        ws, p,
+        fields: [
+          ['目的', p.aim],
+          ['ファシリテーション・介入', p.intervention],
+          ['予想反応', p.expectedReaction],
+          ['実際の反応', p.evaluation.actualReaction],
+          ...p.evaluation.reviews.map(r => [`振り返り（${r.reviewer}）`, r.note]),
+          ['次回メモ', p.evaluation.nextMemo],
+        ],
+      })),
+    ]);
+}
+
+// 複数語は AND。同じプロセス（またはワークショップ全体）のテキストを1つにまとめて判定する
+function searchRecords(query) {
+  const terms = searchTerms(query);
+  if (terms.length === 0) return { terms, hits: [] };
+  const hits = searchDocuments()
+    .filter(d => {
+      const all = normalizeText(d.fields.map(f => f[1]).join('\n'));
+      return terms.every(t => all.includes(t));
+    })
+    .map(d => ({ ...d, matches: d.fields.filter(([, text]) => text && terms.some(t => normalizeText(text).includes(t))) }))
+    .sort((a, b) => compareByDateDesc(a.ws, b.ws) || (a.p ? a.p.order : 0) - (b.p ? b.p.order : 0));
+  return { terms, hits };
+}
+
+// 一致語の前後30文字程度を抜き出し、一致語を <mark> で強調する。
+// 強調は「エスケープした文字列」に対して行う（元の文字列を区切ってから、それぞれをエスケープする）
+function excerptHtml(text, terms, radius = 30) {
+  // 1文字ずつ正規化し、正規化後の位置 → 元の位置の対応表を作る
+  let norm = '';
+  const map = [];
+  for (let i = 0; i < text.length;) {
+    const ch = String.fromCodePoint(text.codePointAt(i));
+    const n = ch.normalize('NFKC').toLowerCase();
+    for (let k = 0; k < n.length; k++) { norm += n[k]; map.push(i); }
+    i += ch.length;
+  }
+  map.push(text.length);
+
+  const ranges = [];
+  terms.forEach(t => {
+    let from = 0;
+    let idx;
+    while ((idx = norm.indexOf(t, from)) !== -1) {
+      const start = map[idx];
+      const end = Math.max(map[idx + t.length], start + 1);
+      ranges.push([start, end]);
+      from = idx + t.length;
+    }
+  });
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  ranges.forEach(r => {
+    const last = merged[merged.length - 1];
+    if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]);
+    else merged.push(r.slice());
+  });
+
+  const oneLine = s => s.replace(/\s+/g, ' ');
+  // 一文字ずつの正規化で位置が取れない場合（濁点の合成など）は、先頭から強調なしで出す
+  if (merged.length === 0) return esc(oneLine(text.slice(0, radius * 2))) + (text.length > radius * 2 ? '…' : '');
+
+  const winStart = Math.max(0, merged[0][0] - radius);
+  const winEnd = Math.min(text.length, merged[0][1] + radius);
+  let html = winStart > 0 ? '…' : '';
+  let pos = winStart;
+  merged.filter(([s, e]) => s >= winStart && e <= winEnd).forEach(([s, e]) => {
+    html += esc(oneLine(text.slice(pos, s))) + `<mark>${esc(oneLine(text.slice(s, e)))}</mark>`;
+    pos = e;
+  });
+  html += esc(oneLine(text.slice(pos, winEnd))) + (winEnd < text.length ? '…' : '');
+  return html;
+}
+
+function diamondFindings(ws) {
+  const a = analyzeDiamond(ws);
+  if (a.runs.length === 0) return ['展開（発散／収束）が設定されたプロセスはまだありません。'];
+  const flow = a.runs.map(r => `${PHASE_LABELS[r.phase]}（P${r.from + 1}${r.to > r.from ? `〜P${r.to + 1}` : ''}）`).join(' → ');
+  const lines = [`並び: ${flow}`];
+  if (a.isDoubleDiamond) lines.push('発散→収束が2回続く、ダブルダイヤモンドの形になっています。');
+  else lines.push(`発散→収束のまとまりは${a.diamonds}つです。`);
+  if (a.startsWithConverge) lines.push('最初のまとまりが収束から始まっています。');
+  if (a.endsWithDiverge) lines.push('最後のまとまりが発散で終わっています（そのあとの収束がありません）。');
+  lines.push(`時間配分: 発散 ${formatMinutes(a.divergeMinutes)} ／ 収束 ${formatMinutes(a.convergeMinutes)}（バッファ込み）`);
+  // 準備やオープニングなど、展開を付けないプロセスがあるのは自然なので、未設定の件数は表示しない
+  return lines;
+}
+
+// ===== 状態遷移（5-7） =====
+// 状態を変える操作はすべてここを通す。表にない操作では状態は変わらない
+const TRANSITIONS = {
+  designing: { confirmDesign: 'designed', completeEvaluation: 'evaluated' },
+  designed:  { editDesign: 'designing', completeEvaluation: 'evaluated' },
+  evaluated: {},
+};
+
+function transition(ws, action) {
+  const next = TRANSITIONS[ws.status][action];
+  if (next) {
+    ws.status = next;
+    touch(ws);
+  }
+  return ws.status;
+}
+
+// ===== 正規化（保存データ・読み込みデータを6章の形にそろえる） =====
+function normalizeUxAxes(raw) {
+  if (!Array.isArray(raw)) return deepCopy(LEGACY_UX_AXES);
+  const seen = new Set();
+  const axes = raw
+    .filter(isPlainObject)
+    .map(a => ({ id: str(a.id), label: str(a.label) }))
+    .filter(a => a.id !== '' && !seen.has(a.id) && seen.add(a.id))
+    .slice(0, UX_AXES_MAX);
+  return axes.length >= UX_AXES_MIN ? axes : deepCopy(LEGACY_UX_AXES);
+}
+
+function normalizeProcess(raw, index, axes) {
+  const ev  = isPlainObject(raw.evaluation) ? raw.evaluation : {};
+  const uxE = isPlainObject(raw.uxExpected) ? raw.uxExpected : {};
+  const uxA = isPlainObject(ev.uxActual) ? ev.uxActual : {};
+  return {
+    id: str(raw.id) || newId(),
+    order: index + 1,
+    name: str(raw.name),
+    category: str(raw.category),
+    workType: oneOf(raw.workType, WORK_TYPES, ''),
+    format: oneOf(raw.format, FORMATS, ''),
+    phase: oneOf(raw.phase, PHASES, ''),
+    aim: str(raw.aim),
+    intervention: str(raw.intervention),
+    expectedReaction: str(raw.expectedReaction),
+    duration: nonNegInt(raw.duration, 10),
+    bufferAfter: nonNegInt(raw.bufferAfter, 0),
+    uxExpected: Object.fromEntries(axes.map(a => [a.id, uxValue(uxE[a.id], 3)])),
+    evaluation: {
+      result: oneOf(ev.result, RESULT_VALUES, ''),
+      actualDuration: nonNegInt(ev.actualDuration, null),
+      actualReaction: str(ev.actualReaction),
+      uxActual: Object.fromEntries(axes.map(a => [a.id, uxValue(uxA[a.id], null)])),
+      reviews: Array.isArray(ev.reviews)
+        ? ev.reviews.filter(isPlainObject).map(r => ({ reviewer: str(r.reviewer).trim() || DEFAULT_REVIEWER, note: str(r.note) }))
+        : [],
+      nextMemo: str(ev.nextMemo),
+    },
+  };
+}
+
+function normalizeWorkshop(raw) {
+  if (!isPlainObject(raw) || !str(raw.id) || !Array.isArray(raw.processes)) return null;
+  const now = nowIso();
+  const isSample = raw.isSample === true;
+  const uxAxes = normalizeUxAxes(raw.uxAxes);
+  const processes = raw.processes
+    .filter(isPlainObject)
+    .map((p, i) => ({ p, i, order: toNumber(p.order) ?? i }))
+    .sort((a, b) => a.order - b.order || a.i - b.i)
+    .map(({ p }, i) => normalizeProcess(p, i, uxAxes));
+  const createdAt = isoOr(raw.createdAt, now);
+  const clock = v => /^\d{2}:\d{2}$/.test(v) ? v : '';
+  return {
+    id: str(raw.id),
+    schemaVersion: SCHEMA_VERSION,
+    name: str(raw.name),
+    date: /^\d{4}-\d{2}-\d{2}$/.test(raw.date) ? raw.date : '',
+    purpose: str(raw.purpose),
+    goal: str(raw.goal),
+    startTime: clock(raw.startTime),
+    endTime: clock(raw.endTime),
+    participantCount: nonNegInt(raw.participantCount, null),
+    participantComposition: str(raw.participantComposition),
+    uxAxes,
+    status: oneOf(raw.status, STATUSES, 'designing'),
+    overallNote: str(raw.overallNote),
+    nextActionNote: str(raw.nextActionNote),
+    isSample,
+    sampleType: isSample ? oneOf(raw.sampleType, SAMPLE_TYPES, null) : null,
+    createdAt,
+    updatedAt: isoOr(raw.updatedAt, createdAt),
+    processes,
+  };
+}
+
+function normalizeAppData(raw) {
+  const data = createEmptyAppData();
+  data.workshops = Array.isArray(raw.workshops) ? raw.workshops.map(normalizeWorkshop).filter(Boolean) : [];
+  if (Array.isArray(raw.categories)) {
+    const list = raw.categories.map(str).map(s => s.trim()).filter(Boolean);
+    if (list.length) data.categories = Array.from(new Set(list));
+    if (data.categories.join('\n') === PREVIOUS_DEFAULT_CATEGORIES.join('\n')) data.categories = DEFAULT_CATEGORIES.slice();
+  }
+  if (isPlainObject(raw.settings) && typeof raw.settings.includeSamplesInStats === 'boolean') {
+    data.settings.includeSamplesInStats = raw.settings.includeSamplesInStats;
+  }
+  return data;
+}
+
+// ===== 旧形式（デモ版）の変換 =====
+// デモ版の id は Date.now() の文字列なので、作成日時として使える
+function legacyTimestamp(id) {
+  return /^\d{13}$/.test(str(id)) ? new Date(Number(id)).toISOString() : null;
+}
+
+function migrateLegacyWorkshop(old) {
+  if (!isPlainObject(old)) return null;
+  const procs = Array.isArray(old.processes) ? old.processes.filter(isPlainObject) : [];
+  const evaluated = procs.some(p => isPlainObject(p.evaluation) && RESULT_VALUES.includes(p.evaluation.result));
+  const ts = legacyTimestamp(old.id) || nowIso();
+  return normalizeWorkshop({
+    id: str(old.id) || newId(),
+    name: old.name,
+    date: old.date,
+    participantCount: toNumber(old.participantCount) > 0 ? old.participantCount : null,
+    participantComposition: old.participantType,
+    status: evaluated ? 'evaluated' : 'designed',
+    overallNote: old.overallNote,
+    createdAt: ts,
+    updatedAt: ts,
+    // デモ版は削除時に order を振り直さないため、配列の並びを正とする
+    processes: procs.map((p, i) => {
+      const ev = isPlainObject(p.evaluation) ? p.evaluation : {};
+      const note = str(ev.note);
+      return {
+        id: p.id,
+        order: i + 1,
+        name: p.name,
+        category: '',
+        workType: p.type1,
+        format: p.type2,
+        aim: p.aim,
+        expectedReaction: p.expectedReaction,
+        duration: p.duration,
+        bufferAfter: p.bufferAfter,
+        uxExpected: p.uxExpected,
+        evaluation: {
+          result: ev.result,
+          actualReaction: ev.actualReaction,
+          // デモ版は未操作でも3が入るため、結果が未選択のプロセスは未入力（null）とみなす
+          uxActual: RESULT_VALUES.includes(ev.result) ? ev.uxActual : null,
+          reviews: note.trim() ? [{ reviewer: DEFAULT_REVIEWER, note }] : [],
+        },
+      };
+    }),
+  });
+}
+
+// ===== サンプルデータ（8章） =====
+// サンプルは初回起動時に自動で読み込み、ホームの「サンプルを読み込む」でいつでも読み込み直せる。
+// 固定の id を持ち、読み込み直すときは同じ id のサンプルだけを置き換え、利用者のデータには触れない。
+// 名前の先頭に【サンプル】を付けて区別する。
+// 実データ由来のサンプル（8-1）は、固有名や個人のコメントが残っていたため組み込まない
+const SAMPLE_TIMESTAMP = '2026-10-26T00:00:00.000Z';
+
+// 架空サンプル（8-2）。実在の開催記録ではなく、傾向表示の仕組みを見せるためのもの。
+// 3回とも同じ流れ（準備→アイスブレイク→発想→共有→発想→共有）にし、次の参考情報が出るように数値を置いている:
+//   R1 アイデア共有: 6回中3回「予想より悪かった」
+//   R2 アイデア発想: 実績が予定より平均+4.7分（+5,+8,+3,+6,+2,+4）
+//   R3 アイスブレイク: バッファ消費率 平均7%（超過 0,1,0分 ／ バッファ5分）
+//   R4 アイスブレイク: 緊張感が予想より平均1.3低い ／ アイデア共有: 達成感が予想より平均0.8低い
+function sampleProcess(wsId, order, d) {
+  const ux = arr => arr ? { expectation: arr[0], achievement: arr[1], tension: arr[2] } : { expectation: null, achievement: null, tension: null };
+  return {
+    id: `${wsId}-p${String(order).padStart(2, '0')}`,
+    order,
+    name: d.name,
+    category: d.category,
+    workType: d.workType || '',
+    format: d.format || '',
+    phase: d.phase || '',
+    aim: d.aim || '',
+    intervention: d.intervention || '',
+    expectedReaction: d.expected || '',
+    duration: d.duration,
+    bufferAfter: d.buffer || 0,
+    uxExpected: ux(d.ux),
+    evaluation: {
+      result: d.result || '',
+      actualDuration: d.actual ?? null,
+      actualReaction: d.reaction || '',
+      uxActual: ux(d.uxActual),
+      reviews: (d.reviews || []).map(([reviewer, note]) => ({ reviewer, note })),
+      nextMemo: d.nextMemo || '',
+    },
+  };
+}
+
+function sampleWorkshop(d) {
+  return {
+    id: d.id,
+    schemaVersion: SCHEMA_VERSION,
+    name: d.name,
+    date: d.date,
+    purpose: d.purpose,
+    goal: d.goal,
+    startTime: d.startTime,
+    endTime: d.endTime,
+    participantCount: d.participantCount,
+    participantComposition: d.participantComposition,
+    uxAxes: deepCopy(DEFAULT_UX_AXES),
+    status: 'evaluated',
+    overallNote: d.overallNote,
+    nextActionNote: d.nextActionNote,
+    isSample: true,
+    sampleType: 'fictional',
+    createdAt: SAMPLE_TIMESTAMP,
+    updatedAt: SAMPLE_TIMESTAMP,
+    processes: d.processes.map((p, i) => sampleProcess(d.id, i + 1, p)),
+  };
+}
+
+// 3回で共通の設計部分
+const SAMPLE_FLOW = {
+  prep: {
+    name: '会場準備・受付', category: '準備', duration: 20,
+    aim: '迷わず着席でき、始まる前から話しやすい空気をつくる',
+    intervention: '入口で名札を渡し、近くの人と一言交わすよう声をかける',
+  },
+  ice: {
+    name: '自己紹介ワーク', category: 'アイスブレイク', workType: 'output', format: 'group', duration: 15, buffer: 5,
+    aim: '初対面同士の緊張をほぐし、話す・聞くの練習をする',
+    intervention: '最初にファシリが自分の失敗談を話し、ハードルを下げる',
+    expected: '最初はぎこちないが、後半は笑いが出る', ux: [3, 3, 4],
+  },
+  explore: {
+    name: '課題の探索', category: 'アイデア発想', phase: 'diverge', workType: 'output', format: 'individual', duration: 30, buffer: 5,
+    aim: '思い込みを外し、困りごとの候補をたくさん出す',
+    intervention: '付箋1枚に1つ。質より量と伝え、手が止まった人に問いを投げる',
+    expected: '前半は手が止まるが、他人の付箋を見て増えていく', ux: [3, 3, 3],
+  },
+  define: {
+    name: '課題の絞り込み', category: 'アイデア共有', phase: 'converge', workType: 'output', format: 'group', duration: 20,
+    aim: '出た困りごとを共有し、取り組む課題を1つに決める',
+    intervention: '決めきれないチームには「誰が一番困っているか」で選ぶよう促す',
+    expected: '意見が割れるチームが出るが、時間内に決まる', ux: [3, 4, 3],
+  },
+  ideate: {
+    name: 'アイデア発想', category: 'アイデア発想', phase: 'diverge', workType: 'output', format: 'group', duration: 40, buffer: 10,
+    aim: '決めた課題に対して、解決アイデアを広く出す',
+    intervention: '10分ごとに発想のきっかけカードを配る',
+    expected: '盛り上がり、時間が足りないと感じるチームが出る', ux: [4, 3, 3],
+  },
+  pitch: {
+    name: '発表と選定', category: 'アイデア共有', phase: 'converge', workType: 'output', format: 'group', duration: 25, buffer: 5,
+    aim: 'アイデアを発表し合い、持ち帰るアイデアを選ぶ',
+    intervention: '発表は1チーム2分。聞き手は良い点を付箋で返す',
+    expected: '発表で他チームから刺激を受け、満足して終わる', ux: [3, 4, 3],
+  },
+};
+
+const SAMPLE_FICTIONAL = [
+  sampleWorkshop({
+    id: 'sample-fictional-01',
+    name: '【サンプル】デザイン思考入門ワークショップ（社内研修）',
+    date: '2026-06-12', startTime: '13:00', endTime: '16:00', participantCount: 18,
+    participantComposition: '入社2〜5年目の社員。部署はばらばらで、初対面が多い',
+    purpose: 'デザイン思考の進め方を体験し、自部署の業務改善に使えるようにする',
+    goal: '各チームが「誰のどんな困りごとか」を1文で定義し、解決アイデアを1つ発表する',
+    overallNote: '前半の発散はよく動いたが、共有の場面で時間が押した。発表の型を先に示すと良さそう。',
+    nextActionNote: '課題の絞り込みに使う判断基準を、ワークシートに印刷しておく。',
+    processes: [
+      { ...SAMPLE_FLOW.prep, result: 'as_expected', actual: 20 },
+      { ...SAMPLE_FLOW.ice, result: 'as_expected', actual: 15, uxActual: [4, 3, 3],
+        reaction: '2巡目から笑いが出た', reviews: [['自分', '失敗談から入ったのは効いた。バッファは使わずに済んだ。']] },
+      { ...SAMPLE_FLOW.explore, result: 'better', actual: 35, uxActual: [4, 3, 3],
+        reaction: '付箋が予想より多く出た', reviews: [['自分', '質より量の声かけで手が動いた。貼り出しに5分余計にかかった。']],
+        nextMemo: '付箋を貼る模造紙を先に配っておく' },
+      { ...SAMPLE_FLOW.define, result: 'worse', actual: 23, uxActual: [3, 3, 3],
+        reaction: '2チームが決めきれず延長', reviews: [['自分', '判断基準を口頭で伝えただけでは足りなかった。'], ['共同ファシリ', '声の大きい人の案に寄りがちだった。']],
+        nextMemo: '判断基準を紙で配る' },
+      { ...SAMPLE_FLOW.ideate, result: 'better', actual: 46, uxActual: [4, 4, 3],
+        reaction: 'どのチームも盛り上がった', reviews: [['共同ファシリ', 'きっかけカードの2枚目あたりから一気に出始めた。']] },
+      { ...SAMPLE_FLOW.pitch, result: 'worse', actual: 28, uxActual: [3, 3, 3],
+        reaction: '発表が長くなり、選定が駆け足', reviews: [['自分', '発表の型（誰の・何を・どう解決）を先に示すべきだった。']],
+        nextMemo: '発表テンプレートを用意する' },
+    ],
+  }),
+  sampleWorkshop({
+    id: 'sample-fictional-02',
+    name: '【サンプル】子育て世代の暮らしを考えるアイデアソン',
+    date: '2026-07-24', startTime: '10:00', endTime: '13:00', participantCount: 24,
+    participantComposition: '学生と社会人の混成。半数がアイデアソン初参加',
+    purpose: '子育て世代の困りごとを当事者目線で捉え、地域で試せるアイデアを出す',
+    goal: '各チームが、来月の地域イベントで試せるアイデアを1つ持ち帰る',
+    overallNote: '当事者の話が出たことで課題が具体的になった。発散の時間がもう少し欲しかった。',
+    nextActionNote: '課題の探索を40分に延ばし、その分アイスブレイクを短くする。',
+    processes: [
+      { ...SAMPLE_FLOW.prep, result: 'as_expected', actual: 20 },
+      { ...SAMPLE_FLOW.ice, result: 'better', actual: 16, uxActual: [3, 3, 2],
+        reaction: '子どもの話題で一気に打ち解けた', reviews: [['自分', '思ったより緊張していなかった。初参加でも話しやすい雰囲気だった。']] },
+      { ...SAMPLE_FLOW.explore, result: 'as_expected', actual: 38, uxActual: [3, 3, 3],
+        reaction: '当事者の体験談から付箋が増えた', reviews: [['共同ファシリ', '体験談を聞く時間を入れたら8分延びた。でも中身は濃かった。']],
+        nextMemo: '体験談の時間を最初から組み込む' },
+      { ...SAMPLE_FLOW.define, result: 'as_expected', actual: 22, uxActual: [3, 3, 4] },
+      { ...SAMPLE_FLOW.ideate, result: 'better', actual: 42, uxActual: [5, 4, 2],
+        reaction: '学生のアイデアに社会人が乗る場面が多かった', reviews: [['自分', '混成チームが効いた。発想が広がった。']] },
+      { ...SAMPLE_FLOW.pitch, result: 'better', actual: 30, uxActual: [3, 4, 4],
+        reaction: '質問が多く出て、バッファを使い切った', reviews: [['自分', '質疑が盛り上がったのは良いが、時間は読み違えた。']] },
+    ],
+  }),
+  sampleWorkshop({
+    id: 'sample-fictional-03',
+    name: '【サンプル】顧客体験を見直すデザインスプリント（短縮版）',
+    date: '2026-09-05', startTime: '13:30', endTime: '16:30', participantCount: 12,
+    participantComposition: '営業・開発・サポートの混成チーム。普段から顔見知り',
+    purpose: '顧客が離れていく場面を部署横断で洗い出し、改善の打ち手を見つける',
+    goal: '次の四半期に試す改善案を3つに絞り、担当を決める',
+    overallNote: '顔見知り同士なので立ち上がりは早かった。絞り込みで部署の利害がぶつかり、まとまりに欠けた。',
+    nextActionNote: '共有の場面では、ファシリが論点を整理して見える化する。',
+    processes: [
+      { ...SAMPLE_FLOW.prep, result: 'as_expected', actual: 20 },
+      { ...SAMPLE_FLOW.ice, result: 'as_expected', actual: 14, uxActual: [4, 4, 3],
+        reaction: '短時間で終わった' },
+      { ...SAMPLE_FLOW.explore, result: 'worse', actual: 33, uxActual: [4, 2, 3],
+        reaction: '自部署の話に偏った', reviews: [['自分', '顧客視点に戻す問いかけが遅れた。']],
+        nextMemo: '最初に顧客の1日を描いてから始める' },
+      { ...SAMPLE_FLOW.define, result: 'worse', actual: 20, uxActual: [3, 4, 3],
+        reaction: '部署間で意見が割れた', reviews: [['共同ファシリ', '論点がホワイトボードに残っていなかったので、議論が行き来した。']] },
+      { ...SAMPLE_FLOW.ideate, result: 'as_expected', actual: 44, uxActual: [4, 3, 3] },
+      { ...SAMPLE_FLOW.pitch, result: 'as_expected', actual: 25, uxActual: [3, 2, 4],
+        reaction: '担当は決まったが、熱量はいまひとつ', reviews: [['自分', '決める場面での納得感が足りなかった。']] },
+    ],
+  }),
+];
+
+function buildSampleWorkshops() {
+  return SAMPLE_FICTIONAL.map(normalizeWorkshop).filter(Boolean);
+}
+
+async function loadSamples() {
+  flushSave();
+  const samples = buildSampleWorkshops();
+  const existing = samples.filter(s => findWorkshop(s.id));
+  if (existing.length > 0) {
+    const ok = await confirmDialog(
+      `サンプル${samples.length}件のうち${existing.length}件はすでにあります。上書きすると、サンプルに加えた変更は元に戻ります。\nあなたが作成したワークショップには影響しません。`,
+      { title: 'サンプルの読み込み', okLabel: '上書きする' });
+    if (!ok) return;
+  }
+  samples.forEach(s => {
+    const idx = appData.workshops.findIndex(w => w.id === s.id);
+    if (idx < 0) {
+      appData.workshops.push(s);
+    } else {
+      if (currentWS === appData.workshops[idx]) currentWS = null;
+      appData.workshops[idx] = s;
+    }
+  });
+  if (saveAppData()) notify(`サンプル${samples.length}件を読み込みました`);
+  renderHome();
+}
+
+document.getElementById('btn-load-samples').addEventListener('click', loadSamples);
+
+// ===== 保存 =====
+const startupNotices = [];
+
+function readStorage(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+
+function loadAppData() {
+  const raw = readStorage(CONFIG.storageKey);
+  if (raw !== null) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (!isPlainObject(parsed)) throw new Error('unexpected shape');
+      return normalizeAppData(parsed);
+    } catch (e) {
+      // 壊れたデータを上書きしないよう、別キーに退避してから空で始める
+      const backupKey = `${CONFIG.storageKey}.broken-${Date.now()}`;
+      try { localStorage.setItem(backupKey, raw); } catch (e2) { /* 退避できなくても起動は続ける */ }
+      startupNotices.push({ message: `保存データを読み込めませんでした。元のデータは「${backupKey}」に退避しています。`, type: 'error' });
+      return createEmptyAppData();
+    }
+  }
+
+  const legacyRaw = readStorage(CONFIG.legacyStorageKey);
+  if (legacyRaw !== null) {
+    const data = createEmptyAppData();
+    try {
+      const list = JSON.parse(legacyRaw);
+      if (Array.isArray(list)) data.workshops = list.map(migrateLegacyWorkshop).filter(Boolean);
+    } catch (e) {
+      startupNotices.push({ message: 'デモ版のデータを読み込めませんでした。デモ版のデータはそのまま残っています。', type: 'error' });
+      return data;
+    }
+    if (data.workshops.length) {
+      startupNotices.push({ message: `デモ版のデータ${data.workshops.length}件を新しい形式に変換しました。`, type: 'info' });
+      writeAppData(data);
+    }
+    return data;
+  }
+
+  // 初回起動（保存データもデモ版のデータもない）ときは、空の画面にならないようサンプルを入れる
+  const data = createEmptyAppData();
+  data.workshops = buildSampleWorkshops();
+  if (data.workshops.length) {
+    writeAppData(data);
+    startupNotices.push({ message: 'サンプルを読み込みました。カードの「…」からいつでも削除できます。', type: 'info' });
+  }
+  return data;
+}
+
+function writeAppData(data) {
+  try {
+    localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
+    return true;
+  } catch (e) {
+    notify('保存に失敗しました（容量超過などの可能性があります）。データを失わないよう、書き出しをしてください。', 'error');
+    return false;
+  }
+}
+
+function saveAppData() { return writeAppData(appData); }
+
+function findWorkshop(id) { return appData.workshops.find(w => w.id === id); }
+
+// 編集は保存データ上のオブジェクトを直接書き換え、少し待ってからまとめて保存する。
+// 新規作成のワークショップは、最初に何か変更した時点で一覧に加わる（空のカードを残さない）
+let saveTimer = null;
+
+function touch(ws = currentWS) {
+  if (!appData.workshops.includes(ws)) appData.workshops.push(ws);
+  ws.updatedAt = nowIso();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSave, CONFIG.autosaveDelayMs);
+}
+
+function flushSave() {
+  if (saveTimer === null) return true;
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  return saveAppData();
+}
+
+// スマホでタブを閉じる・切り替えるときに、待機中の保存を書き込む
+window.addEventListener('pagehide', flushSave);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') flushSave();
+});
+
+// ===== State =====
+let appData = loadAppData();
+let currentWS = null;
+let currentScreen = 'home';
+
+// ===== 画面切り替え =====
+// 画面を開くたびに現在のデータから描き直す（古い表示が残る不具合の対策）
+const SCREEN_RENDERERS = {
+  home:  renderHome,
+  step1: renderStep1,
+  step2: renderStep2,
+  step3: renderStep3,
+  step4: renderStep4,
+  knowledge: renderKnowledge,
+};
+
+function showScreen(name) {
+  flushSave();
+  if (name.startsWith('step') && !currentWS) name = 'home';
+  currentScreen = name;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+  SCREEN_RENDERERS[name]();
+}
+
+function entryScreenFor(ws) {
+  if (ws.status === 'designing') return 'step1';
+  if (ws.status === 'designed') return isEvaluationInProgress(ws) ? 'step3' : 'step2';
+  return 'step4';
+}
+
+function openWorkshop(ws, screen = entryScreenFor(ws)) {
+  currentWS = ws;
+  showScreen(screen);
+}
+
+function statusBadges(ws) {
+  return [
+    `<span class="status-badge ${ws.status}">${STATUS_LABELS[ws.status]}</span>`,
+    isEvaluationInProgress(ws) ? '<span class="status-sub">評価途中</span>' : '',
+    ws.isSample && ws.sampleType ? `<span class="sample-badge">${SAMPLE_LABELS[ws.sampleType]}</span>` : '',
+  ].join('');
+}
+
+function renderStepHeader(screen) {
+  const el = document.getElementById(screen + '-header');
+  el.innerHTML = `
+    <nav class="step-nav" aria-label="ステップ">
+      <button type="button" class="neumorphic-btn step-nav-btn" data-go="home">← ホーム</button>
+      ${STEPS.map(s => `<button type="button" class="neumorphic-btn step-nav-btn ${s.screen === screen ? 'is-current' : ''}" data-go="${s.screen}">${s.label}</button>`).join('')}
+    </nav>
+    <div class="ws-heading">
+      <span class="ws-heading-name">${esc(currentWS.name || '無題のワークショップ')}</span>
+      ${statusBadges(currentWS)}
+    </div>`;
+  el.querySelectorAll('[data-go]').forEach(btn => {
+    btn.addEventListener('click', () => showScreen(btn.dataset.go));
+  });
+}
+
+function setActions(containerId, actions) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  actions.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'neumorphic-btn ' + (a.primary ? 'primary next-btn' : 'back-btn');
+    btn.textContent = a.label;
+    btn.addEventListener('click', a.onClick);
+    el.appendChild(btn);
+  });
+}
+
+// ===== ホーム =====
+document.getElementById('btn-new-ws').addEventListener('click', () => {
+  openWorkshop(createWorkshop(), 'step1');
+});
+
+// 開催日の新しい順。開催日が未入力のものは先頭
+function compareForHome(a, b) {
+  if (!a.date !== !b.date) return a.date ? 1 : -1;
+  if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+  return a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0;
+}
+
+function renderHome() {
+  const list = document.getElementById('ws-list');
+  // 削除・読み込みで消えたものや、状態の絞り込みで非表示になったものは選択から外す
+  const visible = visibleWorkshops();
+  selectedIds.forEach(id => { if (!visible.some(w => w.id === id)) selectedIds.delete(id); });
+  document.getElementById('select-toolbar').hidden = appData.workshops.length === 0;  document.querySelectorAll('[data-status-filter]').forEach(input => {
+    input.checked = statusFilter.has(input.dataset.statusFilter);
+  });
+  updateSelectionUI();
+  if (appData.workshops.length > 0 && visible.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-text">選んだ状態のワークショップはありません。<br>「状態で絞り込む」のチェックを見直してください。</div></div>';
+    return;
+  }
+  if (appData.workshops.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <div class="empty-text">まだワークショップが記録されていません。<br>最初の記録を始めましょう！</div>
+      </div>`;
+    return;
+  }
+  list.innerHTML = '';
+  visible.sort(compareForHome).forEach(ws => {
+    const count  = r => ws.processes.filter(p => p.evaluation.result === r).length;
+    const dots   = ws.processes.map(p => `<div class="score-dot ${RESULT_DOT[p.evaluation.result]}"></div>`).join('');
+
+    const card = document.createElement('div');
+    card.className = 'neumorphic ws-card' + (selectedIds.has(ws.id) ? ' is-selected' : '');
+    card.dataset.wsId = ws.id;
+    card.innerHTML = `
+      <div class="ws-card-header">
+        <div class="ws-card-title-row">
+          <label class="card-check" title="書き出しの対象に選ぶ">
+            <input type="checkbox" ${selectedIds.has(ws.id) ? 'checked' : ''} aria-label="${esc(ws.name || '無題のワークショップ')}を選択">
+          </label>
+          <div>
+            <div class="ws-card-title">${esc(ws.name || '無題のワークショップ')}</div>
+            <div class="ws-card-date">${esc(ws.date || '日付未設定')}</div>
+          </div>
+        </div>
+        <button type="button" class="neumorphic-btn card-menu-btn" aria-label="メニュー">…</button>
+      </div>
+      <div class="ws-card-badges">${statusBadges(ws)}</div>
+      <div class="ws-card-meta">
+        ${ws.participantCount !== null ? `<span class="tag">👥 ${esc(ws.participantCount)}名</span>` : ''}
+        <span class="tag accent">${ws.processes.length}プロセス</span>
+      </div>
+      <div class="score-bar">${dots}<span class="score-label">${count('better')}↑ ${count('as_expected')}◯ ${count('worse')}↓</span></div>`;
+    card.addEventListener('click', () => openWorkshop(ws));
+    // ☑の操作ではカードを開かない
+    const check = card.querySelector('.card-check');
+    check.addEventListener('click', e => e.stopPropagation());
+    check.querySelector('input').addEventListener('change', e => {
+      if (e.target.checked) selectedIds.add(ws.id);
+      else selectedIds.delete(ws.id);
+      card.classList.toggle('is-selected', e.target.checked);
+      updateSelectionUI();
+    });
+    card.querySelector('.card-menu-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      openCardMenu(ws);
+    });
+    list.appendChild(card);
+  });
+}
+
+const RESULT_DOT = { better: 'ok', as_expected: 'good', worse: 'bad', '': 'none' };
+
+async function openCardMenu(ws) {
+  const action = await openModal({
+    title: ws.name || '無題のワークショップ',
+    stacked: true,
+    actions: [
+      { label: '複製', value: 'duplicate' },
+      { label: 'このワークショップを書き出し', value: 'export' },
+      { label: '削除', value: 'delete', kind: 'danger' },
+      { label: 'キャンセル', value: null },
+    ],
+  });
+  if (action === 'export') {
+    exportOne(ws);
+  } else if (action === 'duplicate') {
+    appData.workshops.push(duplicateWorkshop(ws));
+    if (saveAppData()) notify('複製しました（設計中）');
+    renderHome();
+  } else if (action === 'delete') {
+    const ok = await confirmDialog(`「${ws.name || '無題のワークショップ'}」を削除します。\nこの操作は元に戻せません。`, { title: '削除の確認', okLabel: '削除する', danger: true });
+    if (!ok) return;
+    appData.workshops = appData.workshops.filter(w => w !== ws);
+    if (currentWS === ws) currentWS = null;
+    if (saveAppData()) notify('削除しました');
+    renderHome();
+  }
+}
+
+// ===== STEP1 事前プロセス設計 =====
+function renderStep1() {
+  renderStepHeader('step1');
+  const ws = currentWS;
+  const locked = ws.status === 'designed';
+  document.getElementById('step1-fieldset').disabled = locked;
+
+  const banner = document.getElementById('step1-banner');
+  if (locked) {
+    banner.innerHTML = `
+      <div class="banner info">
+        <span>設計済みです。内容を変更すると「設計中」に戻ります。</span>
+        <button type="button" class="neumorphic-btn" id="btn-unlock-design">変更する</button>
+      </div>`;
+    banner.querySelector('#btn-unlock-design').addEventListener('click', async () => {
+      const ok = await confirmDialog('設計中に戻ります。変更後、STEP2で改めて「設計を確定する」を押してください。', { okLabel: '設計中に戻す' });
+      if (!ok) return;
+      transition(ws, 'editDesign');
+      flushSave();
+      renderStep1();
+    });
+  } else if (ws.status === 'evaluated') {
+    banner.innerHTML = '<div class="banner warn">評価済みです。設計を変更すると、評価との比較に影響します。</div>';
+  } else {
+    banner.innerHTML = '';
+  }
+
+  document.getElementById('ws-name').value        = ws.name;
+  document.getElementById('ws-date').value        = ws.date;
+  document.getElementById('ws-purpose').value     = ws.purpose;
+  document.getElementById('ws-goal').value        = ws.goal;
+  renderTimeSelect('ws-start', ws.startTime);
+  renderTimeSelect('ws-end', ws.endTime);
+  document.getElementById('ws-count').value       = ws.participantCount ?? '';
+  document.getElementById('ws-composition').value = ws.participantComposition;
+  renderAxesEditor();
+  renderProcessList();
+}
+
+// 予定の実施時間（開始〜終了）と、プロセスを積み上げた合計を並べて表示する
+function updateDesignSummary() {
+  const ws = currentWS;
+  const win = scheduledWindowMinutes(ws);
+  document.getElementById('ws-window-note').textContent = win !== null
+    ? `予定の実施時間：${formatMinutes(win)}`
+    : '開始・終了時刻を入れると、予定の実施時間が表示されます';
+
+  const fit = windowFitLabel(ws);
+  const fitClass = fit.startsWith('予定を') ? ' style="color:#FFB0A0;"' : '';
+  document.getElementById('design-summary').innerHTML =
+    `予定 <strong>${esc(scheduledRangeLabel(ws))}</strong>` +
+    `<br>プロセス合計 <strong>${formatMinutes(totalPlannedMinutes(ws))}</strong>（バッファ込み・${ws.processes.length}プロセス）／ 終了見込み ${esc(plannedEndLabel(ws))}` +
+    (fit ? `<br><span${fitClass}>${esc(fit)}</span>` : '');
+}
+
+// ===== UX予想の項目（ワークショップごと） =====
+function renderAxesEditor() {
+  const ws = currentWS;
+  const editor = document.getElementById('ux-axes-editor');
+  editor.innerHTML = ws.uxAxes.map((a, i) => `
+    <div class="axis-row">
+      <span class="axis-dot" style="background:${UX_COLORS[i]};"></span>
+      <div class="neumorphic-inset">
+        <input class="form-input axis-label-input" type="text" value="${esc(a.label)}" placeholder="項目${i + 1}（例：没入感）" aria-label="項目${i + 1}の名前" data-axis="${i}">
+      </div>
+      <button type="button" class="neumorphic-btn delete-btn axis-delete" data-axis="${i}" ${ws.uxAxes.length <= UX_AXES_MIN ? 'disabled' : ''}>削除</button>
+    </div>`).join('');
+  document.getElementById('btn-add-axis').disabled = ws.uxAxes.length >= UX_AXES_MAX;
+
+  editor.querySelectorAll('.axis-label-input').forEach(input => {
+    const axis = ws.uxAxes[Number(input.dataset.axis)];
+    input.addEventListener('input', () => {
+      axis.label = input.value;
+      touch();
+    });
+    // 名前の変更はプロセスのスライダー表示にも反映する（入力中に作り直さないよう、確定時に）
+    input.addEventListener('change', renderProcessList);
+  });
+  editor.querySelectorAll('.axis-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const i = Number(btn.dataset.axis);
+      const axis = ws.uxAxes[i];
+      const ok = await confirmDialog(`「${axisLabel(axis, i)}」を削除します。各プロセスのこの項目の予想・実際の値も消えます。`, { okLabel: '削除する', danger: true });
+      if (!ok) return;
+      ws.uxAxes.splice(i, 1);
+      ws.processes.forEach(p => {
+        delete p.uxExpected[axis.id];
+        delete p.evaluation.uxActual[axis.id];
+      });
+      touch();
+      renderAxesEditor();
+      renderProcessList();
+    });
+  });
+}
+
+document.getElementById('btn-add-axis').addEventListener('click', () => {
+  const ws = currentWS;
+  if (ws.uxAxes.length >= UX_AXES_MAX) return;
+  const axis = { id: 'ux-' + newId().slice(0, 8), label: '' };
+  ws.uxAxes.push(axis);
+  ws.processes.forEach(p => {
+    p.uxExpected[axis.id] = 3;
+    p.evaluation.uxActual[axis.id] = null;
+  });
+  touch();
+  renderAxesEditor();
+  renderProcessList();
+  const inputs = document.querySelectorAll('#ux-axes-editor .axis-label-input');
+  inputs[inputs.length - 1].focus();
+});
+
+// 基本情報は入力のたびに反映して自動保存する
+function bindInput(id, apply) {
+  document.getElementById(id).addEventListener('input', e => {
+    apply(e.target.value);
+    touch();
+  });
+}
+bindInput('ws-name',        v => { currentWS.name = v; });
+bindInput('ws-date',        v => { currentWS.date = v; });
+bindInput('ws-purpose',     v => { currentWS.purpose = v; });
+bindInput('ws-goal',        v => { currentWS.goal = v; });
+
+// 開始・終了時刻は「時」と「分（5分刻み）」のプルダウンで選ぶ。
+// <input type="time"> の step は iPhone の Safari で効かないため、select で刻みをそろえる
+const MINUTE_STEP = 5;
+const pad2 = n => String(n).padStart(2, '0');
+
+function renderTimeSelect(prefix, value) {
+  const [h, m] = value ? value.split(':') : ['', ''];
+  const hourSel = document.getElementById(prefix + '-h');
+  const minuteSel = document.getElementById(prefix + '-m');
+  hourSel.innerHTML = '<option value="">--</option>' +
+    Array.from({ length: 24 }, (_, i) => pad2(i))
+      .map(v => `<option value="${v}" ${v === h ? 'selected' : ''}>${Number(v)}</option>`).join('');
+  // 読み込んだデータなどで刻みに合わない分が入っている場合も、その値は残して表示する
+  const minutes = Array.from({ length: 60 / MINUTE_STEP }, (_, i) => pad2(i * MINUTE_STEP));
+  if (m && !minutes.includes(m)) minutes.push(m);
+  minutes.sort();
+  minuteSel.innerHTML = minutes.map(v => `<option value="${v}" ${v === (m || '00') ? 'selected' : ''}>${v}</option>`).join('');
+  minuteSel.disabled = h === '';
+}
+
+function bindTimeSelect(prefix, apply) {
+  const hourSel = document.getElementById(prefix + '-h');
+  const minuteSel = document.getElementById(prefix + '-m');
+  const onChange = () => {
+    const value = hourSel.value === '' ? '' : `${hourSel.value}:${minuteSel.value || '00'}`;
+    apply(value);
+    touch();
+    renderTimeSelect(prefix, value);
+    updateDesignSummary();
+  };
+  hourSel.addEventListener('change', onChange);
+  minuteSel.addEventListener('change', onChange);
+}
+bindTimeSelect('ws-start', v => { currentWS.startTime = v; });
+bindTimeSelect('ws-end',   v => { currentWS.endTime = v; });
+bindInput('ws-count',       v => { currentWS.participantCount = v.trim() === '' ? null : nonNegInt(v, null); });
+bindInput('ws-composition', v => { currentWS.participantComposition = v; });
+bindInput('overall-note',     v => { currentWS.overallNote = v; });
+bindInput('next-action-note', v => { currentWS.nextActionNote = v; });
+
+document.getElementById('btn-add-process').addEventListener('click', () => {
+  currentWS.processes.push(createProcess(currentWS.processes.length + 1, currentWS.uxAxes));
+  touch();
+  renderProcessList();
+});
+document.getElementById('btn-copy-process').addEventListener('click', openCopyProcessesDialog);
+document.getElementById('btn-step1-next').addEventListener('click', () => showScreen('step2'));
+
+const ADD_CATEGORY_VALUE = '__add__';
+const REMOVE_CATEGORY_VALUE = '__remove__';
+
+function categoryOptions(selected) {
+  const list = appData.categories.slice();
+  // 選択肢から削除した種別や、読み込んだデータの種別も、選択中の値は表示する
+  if (selected && !list.includes(selected)) list.push(selected);
+  return `<option value="" ${selected === '' ? 'selected' : ''}>（未設定）</option>` +
+    list.map(c => `<option value="${esc(c)}" ${c === selected ? 'selected' : ''}>${esc(c)}</option>`).join('') +
+    `<option value="${ADD_CATEGORY_VALUE}">＋ 種別を追加…</option>` +
+    `<option value="${REMOVE_CATEGORY_VALUE}">－ 種別を削除…</option>`;
+}
+
+async function addCategoryDialog() {
+  const name = await promptDialog('プロセス種別を追加', { placeholder: '例：フィールドワーク', okLabel: '追加' });
+  if (!name) return null;
+  if (!appData.categories.includes(name)) appData.categories.push(name);
+  return name;
+}
+
+// 種別の削除は選択肢から外すだけ。設定済みのプロセスの値は変えない（過去の記録と集計を壊さないため）
+async function removeCategoryDialog() {
+  if (appData.categories.length === 0) {
+    notify('削除できる種別がありません');
+    return;
+  }
+  const body = document.createElement('div');
+  body.innerHTML = `<div class="manage-list">${appData.categories.map((c, i) => `
+    <div class="manage-row"><span>${esc(c)}</span><button type="button" class="neumorphic-btn delete-btn" data-remove="${i}">削除</button></div>`).join('')}</div>`;
+  body.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', () => closeModal(appData.categories[Number(btn.dataset.remove)]));
+  });
+  const target = await openModal({ title: 'プロセス種別を削除', body, actions: [{ label: '閉じる', value: null }] });
+  if (target === null) return;
+
+  const used = appData.workshops.reduce((n, w) => n + w.processes.filter(p => p.category === target).length, 0)
+    + (appData.workshops.includes(currentWS) ? 0 : currentWS.processes.filter(p => p.category === target).length);
+  const message = `「${target}」を選択肢から削除します。` +
+    (used > 0 ? `\nこの種別を設定済みのプロセス（${used}件）は、そのまま残ります。` : '');
+  if (!(await confirmDialog(message, { okLabel: '削除する', danger: true }))) return;
+  appData.categories = appData.categories.filter(c => c !== target);
+  if (saveAppData()) notify(`「${target}」を選択肢から削除しました`);
+}
+
+function uxExpectedRow(p, axis, i) {
+  const v = p.uxExpected[axis.id];
+  const label = esc(axisLabel(axis, i));
+  return `
+    <div class="ux-slider-row">
+      <div class="ux-slider-label" style="color:${UX_COLORS[i]};">${label}</div>
+      <input type="range" min="1" max="5" value="${v}" data-axis="${esc(axis.id)}" class="ux-range" aria-label="${label}（予想）">
+      <div class="ux-slider-value">${v}</div>
+    </div>`;
+}
+
+const UX_SCALE_NOTE = '<div class="ux-scale-note"><span></span><span><span>1＝低い</span><span>5＝高い</span></span><span></span></div>';
+
+function moveProcess(from, to) {
+  const ps = currentWS.processes;
+  if (to < 0 || to >= ps.length || from === to) return;
+  const [p] = ps.splice(from, 1);
+  ps.splice(to, 0, p);
+  renumber(currentWS);
+  touch();
+  renderProcessList();
+}
+
+let dragFromIndex = null;
+
+function renderProcessList() {
+  const list = document.getElementById('process-list');
+  list.innerHTML = '';
+  const ps = currentWS.processes;
+
+  ps.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'neumorphic process-card';
+
+    card.innerHTML = `
+      <div class="process-card-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="drag-handle" title="ドラッグして並び替え">⠿</span>
+          <div class="process-number">${i + 1}</div>
+        </div>
+        <div class="process-card-tools">
+          <button type="button" class="neumorphic-btn icon-btn" data-move="-1" aria-label="上へ" ${i === 0 ? 'disabled' : ''}>▲</button>
+          <button type="button" class="neumorphic-btn icon-btn" data-move="1" aria-label="下へ" ${i === ps.length - 1 ? 'disabled' : ''}>▼</button>
+          <button type="button" class="neumorphic-btn delete-btn">削除</button>
+        </div>
+      </div>
+
+      <div class="type-section">
+        <div class="type-row">
+          <div class="form-label">プロセス種別</div>
+          <div class="neumorphic-inset">
+            <select class="form-input process-category-input" aria-label="プロセス種別">${categoryOptions(p.category)}</select>
+          </div>
+          ${p.category === '' ? '<div class="form-note warn">種別が未設定です（設定すると、過去の記録と比べられます）</div>' : ''}
+        </div>
+        <div class="type-row">
+          <div class="form-label">タイプ</div>
+          <div class="select-group">
+            <button type="button" class="neumorphic-btn select-btn ${p.workType === 'input'  ? 'is-selected' : ''}" data-type="workType" data-value="input">インプット</button>
+            <button type="button" class="neumorphic-btn select-btn ${p.workType === 'output' ? 'is-selected' : ''}" data-type="workType" data-value="output">アウトプット</button>
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="form-label">展開（ダブルダイヤモンド）</div>
+          <div class="select-group">
+            <button type="button" class="neumorphic-btn select-btn ${p.phase === 'diverge'  ? 'is-selected' : ''}" data-type="phase" data-value="diverge">発散</button>
+            <button type="button" class="neumorphic-btn select-btn ${p.phase === 'converge' ? 'is-selected' : ''}" data-type="phase" data-value="converge">収束</button>
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="form-label">形式</div>
+          <div class="select-group">
+            <button type="button" class="neumorphic-btn select-btn ${p.format === 'individual' ? 'is-selected' : ''}" data-type="format" data-value="individual">個別</button>
+            <button type="button" class="neumorphic-btn select-btn ${p.format === 'group'      ? 'is-selected' : ''}" data-type="format" data-value="group">全体</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-fields">
+        <div>
+          <div class="form-label">プロセス内容</div>
+          <div class="neumorphic-inset">
+            <input class="form-input process-text-input" type="text" placeholder="例：アイスブレイク、高速プロトタイピング"
+              value="${esc(p.name)}" data-field="name">
+          </div>
+        </div>
+        <div>
+          <div class="form-label">目的</div>
+          <div class="neumorphic-inset">
+            <textarea class="form-input process-text-input" rows="2" placeholder="例：参加者同士の関係性作り＆ワークの練習"
+              data-field="aim">${esc(p.aim)}</textarea>
+          </div>
+        </div>
+        <div>
+          <div class="form-label">ファシリテーション・介入</div>
+          <div class="neumorphic-inset">
+            <textarea class="form-input process-text-input" rows="2" placeholder="例：手が止まっているチームに問いを投げる"
+              data-field="intervention">${esc(p.intervention)}</textarea>
+          </div>
+        </div>
+        <div>
+          <div class="form-label">予想される参加者の反応・状態</div>
+          <div class="neumorphic-inset">
+            <textarea class="form-input process-text-input" rows="2" placeholder="例：笑顔が増える、会話が活発になる"
+              data-field="expectedReaction">${esc(p.expectedReaction)}</textarea>
+          </div>
+        </div>
+
+        <div class="fields-row-2">
+          <div>
+            <div class="form-label">時間（分）</div>
+            <div class="neumorphic-inset">
+              <input class="form-input process-num-input" type="number" inputmode="numeric" min="0"
+                value="${p.duration}" data-field="duration">
+            </div>
+          </div>
+          <div>
+            <div class="form-label">バッファ（分）</div>
+            <div class="neumorphic-inset">
+              <input class="form-input process-num-input" type="number" inputmode="numeric" min="0"
+                value="${p.bufferAfter}" data-field="bufferAfter" placeholder="0">
+            </div>
+            <div class="form-note">このプロセス後の余白時間</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-label" style="margin-top:4px;">UX予想（このプロセスでの参加者の感情レベル）</div>
+      <div class="ux-sliders">${currentWS.uxAxes.map((axis, j) => uxExpectedRow(p, axis, j)).join('')}${UX_SCALE_NOTE}</div>
+    `;
+
+    // 並び替え（ボタン）
+    card.querySelectorAll('[data-move]').forEach(btn => {
+      btn.addEventListener('click', () => moveProcess(ps.indexOf(p), ps.indexOf(p) + Number(btn.dataset.move)));
+    });
+
+    // 並び替え（ドラッグ＆ドロップ。入力欄の文字選択と競合しないよう、ハンドルを押したときだけ有効にする）
+    const handle = card.querySelector('.drag-handle');
+    handle.addEventListener('mousedown', () => { card.draggable = true; });
+    handle.addEventListener('mouseup', () => { card.draggable = false; });
+    card.addEventListener('dragstart', e => {
+      dragFromIndex = ps.indexOf(p);
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(dragFromIndex));
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', () => {
+      card.draggable = false;
+      dragFromIndex = null;
+      card.classList.remove('dragging');
+    });
+    card.addEventListener('dragover', e => {
+      if (dragFromIndex === null) return;
+      e.preventDefault();
+      card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      if (dragFromIndex !== null) moveProcess(dragFromIndex, ps.indexOf(p));
+    });
+
+    card.querySelector('.delete-btn').addEventListener('click', async () => {
+      if (hasEvaluationInput(p)) {
+        const ok = await confirmDialog(`「${p.name || 'プロセス ' + (ps.indexOf(p) + 1)}」には評価の入力があります。削除すると評価も消えます。`, { okLabel: '削除する', danger: true });
+        if (!ok) return;
+      }
+      ps.splice(ps.indexOf(p), 1);
+      renumber(currentWS);
+      touch();
+      renderProcessList();
+    });
+
+    card.querySelector('.process-category-input').addEventListener('change', async e => {
+      if (e.target.value === ADD_CATEGORY_VALUE) {
+        const name = await addCategoryDialog();
+        if (name) {
+          p.category = name;
+          touch();
+        }
+      } else if (e.target.value === REMOVE_CATEGORY_VALUE) {
+        await removeCategoryDialog();
+      } else {
+        p.category = e.target.value;
+        touch();
+      }
+      renderProcessList();
+    });
+
+    // 選択式の項目は、選択中のボタンをもう一度押すと未設定に戻る
+    card.querySelectorAll('.select-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const field = btn.dataset.type;
+        p[field] = p[field] === btn.dataset.value ? '' : btn.dataset.value;
+        touch();
+        renderProcessList();
+      });
+    });
+
+    card.querySelectorAll('.process-text-input').forEach(input => {
+      input.addEventListener('input', () => {
+        p[input.dataset.field] = input.value;
+        touch();
+      });
+    });
+
+    card.querySelectorAll('.process-num-input').forEach(input => {
+      input.addEventListener('input', () => {
+        p[input.dataset.field] = nonNegInt(input.value, 0);
+        touch();
+        updateDesignSummary();
+      });
+    });
+
+    card.querySelectorAll('.ux-range').forEach(range => {
+      range.addEventListener('input', () => {
+        p.uxExpected[range.dataset.axis] = parseInt(range.value);
+        range.nextElementSibling.textContent = range.value;
+        touch();
+      });
+    });
+
+    list.appendChild(card);
+  });
+
+  updateDesignSummary();
+}
+
+function workshopLabel(ws) {
+  return `${ws.name || '無題のワークショップ'}（${ws.date || '日付未設定'}）`;
+}
+
+async function openCopyProcessesDialog() {
+  const sources = appData.workshops.filter(w => w !== currentWS && w.processes.length > 0).sort(compareForHome);
+  if (sources.length === 0) {
+    notify('複製できる過去のワークショップがありません');
+    return;
+  }
+
+  const body = document.createElement('div');
+  body.innerHTML = `
+    <div class="form-label">ワークショップを選ぶ</div>
+    <div class="neumorphic-inset">
+      <select class="form-input" aria-label="複製元のワークショップ">
+        ${sources.map((w, i) => `<option value="${i}">${esc(workshopLabel(w))}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-label" style="margin-top:16px;">プロセスを選ぶ（複数可）</div>
+    <div class="check-list"></div>
+    <div class="form-note">設計の内容だけを複製し、評価は空になります。末尾に追加します。</div>`;
+  const select = body.querySelector('select');
+  const checkList = body.querySelector('.check-list');
+  const renderChecks = () => {
+    checkList.innerHTML = sources[Number(select.value)].processes.map((p, j) => `
+      <label class="check-row">
+        <input type="checkbox" value="${j}">
+        <span>${j + 1}. ${esc(p.name || '（名称未設定）')}</span>
+        ${p.category ? `<span class="tag">${esc(p.category)}</span>` : ''}
+      </label>`).join('');
+  };
+  select.addEventListener('change', renderChecks);
+  renderChecks();
+
+  const picked = await openModal({
+    title: '過去のプロセスを複製',
+    body,
+    actions: [
+      { label: 'キャンセル', value: null },
+      {
+        label: '末尾に追加',
+        kind: 'primary',
+        value: () => {
+          const src = sources[Number(select.value)];
+          return Array.from(checkList.querySelectorAll('input:checked'), c => src.processes[Number(c.value)]);
+        },
+      },
+    ],
+  });
+  if (!picked || picked.length === 0) return;
+
+  const srcWs = sources[Number(select.value)];
+  picked.forEach(src => currentWS.processes.push(copyProcessDesign(src, srcWs.uxAxes, currentWS.uxAxes)));
+  renumber(currentWS);
+  touch();
+  renderProcessList();
+  notify(`${picked.length}件のプロセスを追加しました`);
+}
+
+// ===== STEP2 プロセス概要確認 =====
+function renderStep2() {
+  renderStepHeader('step2');
+  const ws = currentWS;
+  const items = [
+    ['ワークショップの目的', ws.purpose || '未設定', 'wide'],
+    ['ワークショップのゴール', ws.goal || '未設定', 'wide'],
+    ['開催日', ws.date || '未設定'],
+    ['予定の時間', scheduledRangeLabel(ws)],
+    ['プロセス合計（バッファ込み）', `${formatMinutes(totalPlannedMinutes(ws))}（終了見込み ${plannedEndLabel(ws)}）`],
+    ['予定との差', windowFitLabel(ws) || '開始・終了時刻が未設定'],
+    ['プロセス数', `${ws.processes.length}`],
+    ['参加者', ws.participantCount !== null ? `${ws.participantCount}名` : '未設定'],
+    ['参加者の特徴', ws.participantComposition || '未設定'],
+  ];
+  document.getElementById('step2-overview').innerHTML = `
+    <dl class="overview-grid">
+      ${items.map(([k, v, cls = '']) => `<div class="overview-item ${cls}"><dt>${esc(k)}</dt><dd class="multiline">${esc(v)}</dd></div>`).join('')}
+    </dl>`;
+
+  renderTimetable('step2-timetable', ws, false);
+  renderReferences(ws);
+
+  // 図の P番号が何のプロセスかを、種別つきで一覧にする（狭い区間はラベルが入りきらないため）
+  document.getElementById('diamond-key').innerHTML = ws.processes.map((p, i) => `
+    <span class="diamond-key-item">
+      <span class="legend-swatch" style="background:${PHASE_COLORS[p.phase]};"></span>
+      <b>P${i + 1}</b>${p.category.trim() ? `（${esc(p.category.trim())}）` : '<span class="unset">（種別未設定）</span>'}${esc(p.name)}
+    </span>`).join('');
+
+  const findings = diamondFindings(ws);
+  document.getElementById('diamond-findings').innerHTML =
+    findings.map((t, i) => `<li class="${i === 1 || findings.length === 1 ? 'lead' : ''}">${esc(t)}</li>`).join('');
+  document.getElementById('ux-legend-step2').innerHTML = uxLegendHtml(ws, false);
+
+  const actions = [{ label: '← 修正する', onClick: () => showScreen('step1') }];
+  if (ws.status === 'designing') {
+    actions.push({ label: '設計を確定する', primary: true, onClick: confirmDesign });
+  } else {
+    actions.push({ label: '結果を入力する →', primary: true, onClick: () => showScreen('step3') });
+  }
+  setActions('step2-actions', actions);
+
+  requestAnimationFrame(drawStep2Charts);
+}
+
+// タイムテーブルの表示。withActual のときは STEP4 用に「予定」「実績」の2列にする
+function renderTimetable(containerId, ws, withActual) {
+  const el = document.getElementById(containerId);
+  if (ws.processes.length === 0) {
+    el.innerHTML = '<div class="note-empty">プロセスがまだありません。</div>';
+    return;
+  }
+  const tt = buildTimetable(ws);
+  // バーの長さは、表の中で最も長い時間を100%とする（予定と実績で同じ尺度）
+  const longest = Math.max(1, ...tt.rows.flatMap(r => withActual ? [r.plan.minutes, r.actual.minutes] : [r.plan.minutes]));
+  const bar = minutes => `<div class="tt-bar-track"><div class="tt-bar" style="width:${(minutes / longest) * 100}%;"></div></div>`;
+  const cell = (label, span, extraClass = '', sub = '') => `
+    <div class="tt-cell ${extraClass}">
+      <span class="tt-label">${label}</span>
+      <span class="tt-time">${formatClock(span.start)}</span>
+      <span class="tt-min">${span.minutes}分</span>
+      ${bar(span.minutes)}
+      ${sub}
+    </div>`;
+
+  const rowsHtml = tt.rows.map(r => {
+    const p = r.process;
+    const isBuffer = r.kind === 'buffer';
+    const name = isBuffer
+      ? 'バッファ'
+      : `${r.index + 1}. ${esc(p.name || '（名称未設定）')}${p.category ? `<span class="tag">${esc(p.category)}</span>` : ''}`;
+    if (!withActual) {
+      return `<div class="tt-row ${isBuffer ? 'is-buffer' : ''}"><div class="tt-name">${name}</div>${cell('予定', r.plan)}</div>`;
+    }
+
+    let sub = '';
+    if (isBuffer) {
+      if (r.actual.filled) sub = '<span class="tt-sub">実績時間が未入力のため予定どおり</span>';
+      else if (r.overflow > 0) sub = `<span class="tt-sub warn">バッファを使い切り、${r.overflow}分超過（以降が後ろにずれます）</span>`;
+      else if (r.used > 0) sub = `<span class="tt-sub">${r.used}分使用・残り${r.actual.minutes}分</span>`;
+      else sub = '<span class="tt-sub">未使用</span>';
+    } else if (r.actual.filled) {
+      sub = '<span class="tt-sub">実績未入力（予定時間で補完）</span>';
+    } else if (r.overflow > 0) {
+      sub = `<span class="tt-sub warn">${r.overflow}分超過（バッファなし。以降が後ろにずれます）</span>`;
+    } else if (r.diff !== 0) {
+      sub = `<span class="tt-sub">予定より${r.diff > 0 ? '+' : ''}${r.diff}分</span>`;
+    }
+    const actualClass = r.actual.filled && !isBuffer ? 'is-filled' : '';
+    return `
+      <div class="tt-row ${isBuffer ? 'is-buffer' : ''} ${r.overflow > 0 ? 'is-overflow' : ''}">
+        <div class="tt-name">${name}</div>
+        ${cell('予定', r.plan)}
+        ${cell('実績', r.actual, actualClass, sub)}
+      </div>`;
+  }).join('');
+
+  const startNote = tt.hasStart ? '' : '<div class="tt-note">開始時刻が未設定のため、0:00 起点の経過時間で表示しています。</div>';
+  const head = withActual
+    ? '<div class="tt-head"><span>プロセス</span><span>予定</span><span>実績</span></div>'
+    : '<div class="tt-head"><span>プロセス</span><span>開始時刻・時間</span></div>';
+
+  let foot = `<div>予定: 合計 <strong>${formatMinutes(tt.plan.total)}</strong>（バッファ込み）／ 終了 <strong>${formatClock(tt.plan.end)}</strong></div>`;
+  if (withActual) {
+    const diff = tt.actual.total - tt.plan.total;
+    const diffText = diff === 0 ? '予定どおり' : `予定より${diff > 0 ? '+' : '−'}${formatMinutes(Math.abs(diff))}`;
+    foot += `<div>実績: 合計 <strong>${formatMinutes(tt.actual.total)}</strong> ／ 終了 <strong>${formatClock(tt.actual.end)}</strong>（${diffText}）</div>`;
+    if (tt.filledCount > 0) foot += `<div class="tt-note" style="margin:0;">実績時間が未入力の${tt.filledCount}件は、予定時間で補っています。</div>`;
+  }
+
+  el.innerHTML = `
+    <div class="${withActual ? 'tt-compare' : ''}">
+      ${startNote}${head}${rowsHtml}
+      <div class="tt-foot">${foot}</div>
+    </div>`;
+}
+
+function drawStep2Charts() {
+  drawDiamondChart('diamond-chart-step2', currentWS);
+  drawUXChart('ux-chart-step2', currentWS, false);
+  drawPieCharts(currentWS, 'step2');
+}
+
+function confirmDesign() {
+  transition(currentWS, 'confirmDesign');
+  if (flushSave()) notify('設計を確定しました');
+  renderStep2();
+}
+
+// ===== STEP3 事後確認・結果報告 =====
+let showOnlyUnevaluated = false;
+
+document.getElementById('filter-unevaluated').addEventListener('change', e => {
+  showOnlyUnevaluated = e.target.checked;
+  renderEvalList();
+});
+
+function renderStep3() {
+  renderStepHeader('step3');
+  const ws = currentWS;
+  document.getElementById('filter-unevaluated').checked = showOnlyUnevaluated;
+  document.getElementById('overall-note').value = ws.overallNote;
+  document.getElementById('next-action-note').value = ws.nextActionNote;
+  renderEvalList();
+
+  if (ws.status === 'evaluated') {
+    setActions('step3-actions', [{ label: '保存', primary: true, onClick: saveEvaluation }]);
+  } else {
+    setActions('step3-actions', [
+      { label: '一時保存', onClick: saveEvaluation },
+      { label: '評価を完了', primary: true, onClick: completeEvaluation },
+    ]);
+  }
+}
+
+function updateUnevaluatedCount() {
+  const n = countUnevaluated(currentWS);
+  document.getElementById('unevaluated-count').textContent = `未評価 ${n} / ${currentWS.processes.length}`;
+}
+
+function renderEvalList() {
+  const list = document.getElementById('eval-list');
+  list.innerHTML = '';
+  updateUnevaluatedCount();
+
+  const ps = currentWS.processes;
+  if (ps.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-text">プロセスが設定されていません。</div></div>';
+    return;
+  }
+  const visible = ps.filter(p => !showOnlyUnevaluated || p.evaluation.result === '');
+  if (visible.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-text">未評価のプロセスはありません。</div></div>';
+    return;
+  }
+  visible.forEach(p => list.appendChild(buildEvalCard(p, ps.indexOf(p))));
+}
+
+function uxActualRow(axis, i, v) {
+  const label = esc(axisLabel(axis, i));
+  return `
+    <div class="ux-slider-row ${v === null ? 'is-unset' : ''}">
+      <div class="ux-slider-label" style="color:${UX_COLORS[i]};">${label}</div>
+      <input type="range" min="1" max="5" value="${v ?? 3}" data-axis="${esc(axis.id)}" class="eval-ux-range" aria-label="${label}（実際）">
+      <div class="ux-slider-value"></div>
+    </div>`;
+}
+
+function buildEvalCard(p, i) {
+  const ev = p.evaluation;
+  const card = document.createElement('div');
+  card.className = 'neumorphic eval-card';
+
+  // 振り返りが1件もない場合は「自分」の欄を1つ出し、入力された時点で追加する
+  const reviewRows = ev.reviews.length ? ev.reviews : [null];
+
+  card.innerHTML = `
+    <div class="eval-header">
+      <div class="process-number">${i + 1}</div>
+      <div>
+        <div class="eval-process-name">${esc(p.name || 'プロセス ' + (i + 1))}</div>
+        ${p.category ? `<span class="tag" style="display:inline-block; margin-top:4px;">${esc(p.category)}</span>` : ''}
+        <div class="eval-aim multiline">${esc(p.aim || '目的未設定')}</div>
+      </div>
+    </div>
+
+    <div class="form-label">このプロセスの結果は？</div>
+    <div class="eval-options">
+      <button type="button" class="neumorphic-btn eval-option" data-result="better">📈 予想より<br>良かった</button>
+      <button type="button" class="neumorphic-btn eval-option" data-result="as_expected">✅ 予想通り<br>だった</button>
+      <button type="button" class="neumorphic-btn eval-option" data-result="worse">📉 予想より<br>悪かった</button>
+    </div>
+
+    <div class="eval-field">
+      <div class="form-label">実績時間</div>
+      <div class="inline-input">
+        <div class="neumorphic-inset">
+          <input class="form-input eval-duration-input" type="number" inputmode="numeric" min="0"
+            value="${ev.actualDuration ?? ''}" placeholder="${p.duration}" aria-label="実績時間（分）">
+        </div>
+        <span>分（予定 ${p.duration}分${p.bufferAfter > 0 ? `＋バッファ ${p.bufferAfter}分` : ''}）</span>
+      </div>
+    </div>
+
+    <div class="eval-field">
+      <div class="form-label">実際の参加者の反応</div>
+      <div class="neumorphic-inset">
+        <textarea class="form-input eval-actual-input" rows="2" placeholder="例：思ったより盛り上がった">${esc(ev.actualReaction)}</textarea>
+      </div>
+    </div>
+
+    <div class="eval-field">
+      <div class="form-label">UX実際（このプロセスでの参加者の感情レベル）</div>
+      <div class="ux-sliders">${currentWS.uxAxes.map((axis, j) => uxActualRow(axis, j, ev.uxActual[axis.id])).join('')}${UX_SCALE_NOTE}</div>
+    </div>
+
+    <div class="eval-field">
+      <div class="form-label">振り返りメモ</div>
+      <div class="review-list">
+        ${reviewRows.map((r, j) => `
+          <div class="review-row" data-review="${j}">
+            <div class="review-row-head">
+              <div class="neumorphic-inset">
+                <input class="form-input review-reviewer" type="text" value="${esc(r ? r.reviewer : DEFAULT_REVIEWER)}" placeholder="記入者名" aria-label="記入者名">
+              </div>
+              ${r ? '<button type="button" class="neumorphic-btn delete-btn review-delete">削除</button>' : ''}
+            </div>
+            <div class="neumorphic-inset">
+              <textarea class="form-input review-note" rows="2" placeholder="気づいたこと">${esc(r ? r.note : '')}</textarea>
+            </div>
+          </div>`).join('')}
+      </div>
+      <button type="button" class="neumorphic-btn add-review-btn">＋ 記入者を追加</button>
+    </div>
+
+    <div class="eval-field" style="margin-bottom:0;">
+      <div class="form-label">このプロセスの次回メモ</div>
+      <div class="neumorphic-inset">
+        <textarea class="form-input eval-next-memo" rows="2" placeholder="次にこのプロセスを使うときに変えること">${esc(ev.nextMemo)}</textarea>
+      </div>
+    </div>
+  `;
+
+  const rerenderCard = () => card.replaceWith(buildEvalCard(p, i));
+
+  // 結果: 選び直しやすいよう、同じボタンをもう一度押すと未選択に戻す。
+  // 「未評価のみ」表示中でもカードが消えないよう、その場でボタンの見た目だけを更新する
+  const resultButtons = card.querySelectorAll('[data-result]');
+  const paintResult = () => {
+    resultButtons.forEach(btn => {
+      btn.classList.remove('selected-ok', 'selected-good', 'selected-bad');
+      if (btn.dataset.result === ev.result) btn.classList.add('selected-' + RESULT_DISPLAY[ev.result][0]);
+    });
+  };
+  paintResult();
+  resultButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      ev.result = ev.result === btn.dataset.result ? '' : btn.dataset.result;
+      touch();
+      paintResult();
+      updateUnevaluatedCount();
+    });
+  });
+
+  card.querySelector('.eval-duration-input').addEventListener('input', e => {
+    ev.actualDuration = e.target.value.trim() === '' ? null : nonNegInt(e.target.value, null);
+    touch();
+  });
+
+  card.querySelector('.eval-actual-input').addEventListener('input', e => {
+    ev.actualReaction = e.target.value;
+    touch();
+  });
+
+  card.querySelector('.eval-next-memo').addEventListener('input', e => {
+    ev.nextMemo = e.target.value;
+    touch();
+  });
+
+  // UX実際: 触れた時点で値を入れる（3のまま押しただけでも「入力あり」にする）。
+  // ドラッグ中に要素を作り直すと操作が途切れるため、表示はその場で書き換える
+  card.querySelectorAll('.eval-ux-range').forEach(range => {
+    const key = range.dataset.axis;
+    const row = range.parentElement;
+    const valueCell = range.nextElementSibling;
+    const paint = () => {
+      const v = ev.uxActual[key];
+      row.classList.toggle('is-unset', v === null);
+      if (v === null) {
+        valueCell.textContent = '未入力';
+        range.value = 3;
+        return;
+      }
+      valueCell.innerHTML = `${v}<button type="button">未入力に戻す</button>`;
+      valueCell.querySelector('button').addEventListener('click', () => {
+        ev.uxActual[key] = null;
+        touch();
+        paint();
+      });
+    };
+    const commit = () => {
+      ev.uxActual[key] = parseInt(range.value);
+      touch();
+      paint();
+    };
+    range.addEventListener('input', commit);
+    range.addEventListener('pointerup', () => { if (ev.uxActual[key] === null) commit(); });
+    paint();
+  });
+
+  // 振り返り（複数人分）
+  const ensureReview = j => {
+    if (!ev.reviews[j]) ev.reviews[j] = { reviewer: DEFAULT_REVIEWER, note: '' };
+    return ev.reviews[j];
+  };
+  card.querySelectorAll('.review-row').forEach(row => {
+    const j = Number(row.dataset.review);
+    row.querySelector('.review-reviewer').addEventListener('input', e => {
+      ensureReview(j).reviewer = e.target.value;
+      touch();
+    });
+    row.querySelector('.review-note').addEventListener('input', e => {
+      ensureReview(j).note = e.target.value;
+      touch();
+    });
+    const del = row.querySelector('.review-delete');
+    if (del) {
+      del.addEventListener('click', async () => {
+        if (ev.reviews[j].note.trim() !== '') {
+          const ok = await confirmDialog(`${ev.reviews[j].reviewer || '記入者未設定'}の振り返りを削除します。`, { okLabel: '削除する', danger: true });
+          if (!ok) return;
+        }
+        ev.reviews.splice(j, 1);
+        touch();
+        rerenderCard();
+      });
+    }
+  });
+  card.querySelector('.add-review-btn').addEventListener('click', () => {
+    if (ev.reviews.length === 0) ev.reviews.push({ reviewer: DEFAULT_REVIEWER, note: '' });
+    ev.reviews.push({ reviewer: '', note: '' });
+    touch();
+    rerenderCard();
+  });
+
+  return card;
+}
+
+// 入力内容は自動保存しているため、一時保存・保存は保存を確定させて知らせる
+function saveEvaluation() {
+  touch();
+  if (flushSave()) notify(currentWS.status === 'evaluated' ? '保存しました' : '一時保存しました');
+}
+
+async function completeEvaluation() {
+  const n = countUnevaluated(currentWS);
+  if (n > 0) {
+    const ok = await confirmDialog(`結果が未選択のプロセスが${n}件あります。このまま評価を完了しますか？\n（完了後も修正できます）`, { okLabel: '評価を完了' });
+    if (!ok) return;
+  }
+  transition(currentWS, 'completeEvaluation');
+  if (!flushSave()) return;
+  notify('評価を完了しました');
+  showScreen('step4');
+}
+
+// ===== STEP4 振り返り・結果確認 =====
+document.getElementById('btn-step4-edit').addEventListener('click', () => showScreen('step3'));
+document.getElementById('btn-step4-home').addEventListener('click', () => showScreen('home'));
+
+function actualTimeHtml(p) {
+  const actual = p.evaluation.actualDuration;
+  if (actual === null) return `<span class="time-filled">未入力（予定 ${p.duration}分）</span>`;
+  const diff = actual - p.duration;
+  const diffHtml = diff === 0 ? '±0' : `<span class="time-diff ${diff > 0 ? 'over' : 'under'}">${diff > 0 ? '+' : ''}${diff}分</span>`;
+  return `${actual}分 <span class="time-filled">（予定 ${p.duration}分 / ${diffHtml}）</span>`;
+}
+
+function reviewsHtml(p) {
+  return p.evaluation.reviews
+    .filter(r => r.note.trim() !== '')
+    .map(r => `<div class="review-line"><span class="reviewer">${esc(r.reviewer)}</span>${esc(r.note)}</div>`)
+    .join('');
+}
+
+function renderStep4() {
+  renderStepHeader('step4');
+  const ws = currentWS;
+  const count = r => ws.processes.filter(p => p.evaluation.result === r).length;
+  document.getElementById('step4-summary').innerHTML = `
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <span class="result-badge ok">📈 予想より良かった ${count('better')}</span>
+      <span class="result-badge good">✅ 予想通り ${count('as_expected')}</span>
+      <span class="result-badge bad">📉 予想より悪かった ${count('worse')}</span>
+      <span class="result-badge none">未評価 ${count('')}</span>
+    </div>`;
+  renderTimetable('step4-timetable', ws, true);
+
+  const tbody = document.getElementById('compare-tbody');
+  const cards = document.getElementById('compare-cards');
+  tbody.innerHTML = '';
+  cards.innerHTML = '';
+  ws.processes.forEach((p, i) => {
+    const [cls, label] = RESULT_DISPLAY[p.evaluation.result];
+    const reviews = reviewsHtml(p);
+    const typeLabel = p.workType || p.format ? `${WORK_TYPE_LABELS[p.workType]}／${FORMAT_LABELS[p.format]}` : '';
+    const meta = [p.category, typeLabel, p.phase ? PHASE_LABELS[p.phase] : ''].filter(Boolean)
+      .map(t => `<span class="tag" style="display:inline-block; margin:4px 4px 0 0;">${esc(t)}</span>`).join('');
+    const bufLabel = p.bufferAfter > 0 ? `<br><span style="font-size:10px;color:var(--main3-lighter);">+${p.bufferAfter}分バッファ</span>` : '';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="process-number" style="width:24px;height:24px;font-size:11px;">${i + 1}</div></td>
+      <td style="font-weight:bold;">${esc(p.name || '-')}${bufLabel}<br>${meta}</td>
+      <td class="sub multiline">${esc(p.aim || '-')}</td>
+      <td class="sub multiline">${esc(p.intervention || '-')}</td>
+      <td class="sub multiline">${esc(p.expectedReaction || '-')}</td>
+      <td><span class="result-badge ${cls}">${label}</span></td>
+      <td class="sub">${actualTimeHtml(p)}</td>
+      <td class="sub multiline">${reviews || '-'}</td>
+      <td class="sub multiline">${esc(p.evaluation.nextMemo || '-')}</td>`;
+    tbody.appendChild(tr);
+
+    // スマホ幅では表の代わりにカードで表示する
+    const fields = [
+      ['目的', esc(p.aim)],
+      ['ファシリテーション・介入', esc(p.intervention)],
+      ['予想反応', esc(p.expectedReaction)],
+      ['実際の反応', esc(p.evaluation.actualReaction)],
+      ['実績時間', actualTimeHtml(p)],
+      ['振り返り', reviews],
+      ['次回メモ', esc(p.evaluation.nextMemo)],
+    ].filter(([, v]) => v !== '');
+    const card = document.createElement('div');
+    card.className = 'neumorphic compare-card';
+    card.innerHTML = `
+      <div class="compare-card-head">
+        <div class="process-number" style="width:24px;height:24px;font-size:11px;">${i + 1}</div>
+        <div>
+          <div class="compare-card-name">${esc(p.name || '-')}</div>
+          <span class="result-badge ${cls}">${label}</span>${meta}
+        </div>
+      </div>
+      <dl>${fields.map(([k, v]) => `<div><dt>${k}</dt><dd class="multiline">${v}</dd></div>`).join('')}</dl>`;
+    cards.appendChild(card);
+  });
+
+  const noteBlock = (label, text) => `
+    <div class="note-block">
+      <div class="form-label">${label}</div>
+      ${text ? `<div class="multiline" style="font-size:14px; line-height:1.7; color:var(--main3-light);">${esc(text)}</div>` : '<div class="note-empty">未入力</div>'}
+    </div>`;
+  document.getElementById('step4-notes').innerHTML =
+    noteBlock('全体の気づき', ws.overallNote) + noteBlock('次回への改善メモ', ws.nextActionNote);
+  document.getElementById('ux-legend-step4').innerHTML = uxLegendHtml(ws, true);
+
+  requestAnimationFrame(drawStep4Charts);
+}
+
+function drawStep4Charts() {
+  drawUXChart('ux-chart-step4', currentWS, true);
+  drawPieCharts(currentWS, 'step4');
+}
+
+// ===== JSONの書き出し（9章） =====
+function exportPayload(workshops) {
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    exportedAt: nowIso(),
+    workshops: deepCopy(workshops),
+    categories: appData.categories.slice(),
+  };
+}
+
+function ymd(d = new Date()) {
+  return `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}`;
+}
+
+// ファイル名に使えない文字（Windows・macOS・iOS で問題になるもの）を置き換える
+function safeFileNamePart(s) {
+  const t = String(s)
+    .replace(/[\\/:*?"<>|\u0000-\u001f\u007f]/g, '_')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^\.+/, '');
+  return (t || '無題').slice(0, 50);
+}
+
+function exportFileName(ws = null) {
+  return ws ? `wslog-${safeFileNamePart(ws.name)}-${ymd()}.json` : `wslog-${ymd()}.json`;
+}
+
+function downloadJson(payload, fileName) {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ホームの一覧で☑したワークショップと、表示する状態（どちらも画面を開いている間だけ保持する）。
+// 選択は常に「表示中のもの」の中だけにし、出力されるのは画面で☑が見えているものに限る
+const selectedIds = new Set();
+const statusFilter = new Set(STATUSES);
+
+function visibleWorkshops() {
+  return appData.workshops.filter(w => statusFilter.has(w.status));
+}
+
+document.querySelectorAll('[data-status-filter]').forEach(input => {
+  input.addEventListener('change', () => {
+    if (input.checked) statusFilter.add(input.dataset.statusFilter);
+    else statusFilter.delete(input.dataset.statusFilter);
+    renderHome();
+  });
+});
+
+function updateSelectionUI() {
+  const total = visibleWorkshops().length;
+  const n = selectedIds.size;
+  const all = document.getElementById('select-all');
+  all.checked = total > 0 && n === total;
+  all.indeterminate = n > 0 && n < total;
+  document.getElementById('select-count').textContent = `${n} / ${total}件を選択中`;
+  document.getElementById('btn-export-selected').disabled = n === 0;
+  document.getElementById('btn-clear-selection').disabled = n === 0;
+  document.getElementById('btn-delete-selected').disabled = n === 0;
+}
+
+function syncCardChecks() {
+  document.querySelectorAll('#ws-list .ws-card').forEach(card => {
+    const on = selectedIds.has(card.dataset.wsId);
+    card.classList.toggle('is-selected', on);
+    card.querySelector('.card-check input').checked = on;
+  });
+  updateSelectionUI();
+}
+
+document.getElementById('select-all').addEventListener('change', e => {
+  selectedIds.clear();
+  if (e.target.checked) visibleWorkshops().forEach(w => selectedIds.add(w.id));
+  syncCardChecks();
+});
+
+document.getElementById('btn-clear-selection').addEventListener('click', () => {
+  selectedIds.clear();
+  syncCardChecks();
+});
+
+// 開催日が期間内のワークショップを選ぶ（選択中のものは置き換える）。開催日が未設定のものは対象外
+document.getElementById('btn-select-range').addEventListener('click', () => {
+  let from = document.getElementById('range-from').value;
+  let to = document.getElementById('range-to').value;
+  if (!from && !to) {
+    notify('期間の開始日か終了日を指定してください');
+    return;
+  }
+  if (from && to && from > to) [from, to] = [to, from];
+  const visible = visibleWorkshops();
+  const matches = visible.filter(w => w.date && (!from || w.date >= from) && (!to || w.date <= to));
+  selectedIds.clear();
+  matches.forEach(w => selectedIds.add(w.id));
+  syncCardChecks();
+  const range = `${from || '指定なし'}〜${to || '指定なし'}`;
+  const undated = visible.filter(w => !w.date).length;
+  notify(`開催日が ${range} のワークショップ ${matches.length}件を選択しました` + (undated ? `（開催日が未設定の${undated}件は対象外）` : ''));
+});
+
+function exportSelected() {
+  flushSave();
+  const list = visibleWorkshops().filter(w => selectedIds.has(w.id)).sort(compareForHome);
+  if (list.length === 0) {
+    notify('書き出すワークショップを☑で選んでください');
+    return;
+  }
+  downloadJson(exportPayload(list), list.length === 1 ? exportFileName(list[0]) : exportFileName());
+  notify(`${list.length}件のワークショップを書き出しました`);
+}
+
+function exportOne(ws) {
+  flushSave();
+  downloadJson(exportPayload([ws]), exportFileName(ws));
+  notify('このワークショップを書き出しました');
+}
+
+// ===== JSONの読み込み（9章） =====
+const IMPORT_MAX_BYTES = 10 * 1024 * 1024;
+
+const isStr = v => typeof v === 'string';
+const isNonNegNumber = v => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+const isClockOrEmpty = v => v === '' || (isStr(v) && /^\d{2}:\d{2}$/.test(v));
+const isIsoString = v => isStr(v) && !Number.isNaN(Date.parse(v));
+const isUx = (v, allowNull) => (allowNull && v === null) || (Number.isInteger(v) && v >= 1 && v <= 5);
+const isUxMap = (v, allowNull) => isPlainObject(v) && Object.values(v).every(x => isUx(x, allowNull));
+
+// 任意の項目は、ファイルにある場合だけ型と値を確かめる（古い形式のファイルには新しい項目がないため）
+function firstInvalid(obj, checks) {
+  const bad = checks.find(([key, ok]) => key in obj && !ok(obj[key]));
+  return bad ? `${bad[2]}の値が不正です` : null;
+}
+
+function validateImportedProcess(p) {
+  if (!isPlainObject(p)) return '形式が不正です';
+  if (!isStr(p.id) || p.id.trim() === '') return 'id がありません';
+  if (!isStr(p.name)) return '名称がありません';
+  if (!isNonNegNumber(p.duration)) return '時間の値が不正です';
+  const err = firstInvalid(p, [
+    ['order', v => typeof v === 'number' && Number.isFinite(v), '順番'],
+    ['bufferAfter', isNonNegNumber, 'バッファ'],
+    ['category', isStr, 'プロセス種別'],
+    ['workType', v => v === '' || WORK_TYPES.includes(v), 'タイプ'],
+    ['format', v => v === '' || FORMATS.includes(v), '形式'],
+    ['phase', v => v === '' || PHASES.includes(v), '展開'],
+    ['aim', isStr, '目的'],
+    ['intervention', isStr, 'ファシリテーション・介入'],
+    ['expectedReaction', isStr, '予想反応'],
+    ['uxExpected', v => isUxMap(v, false), 'UX予想'],
+    ['evaluation', isPlainObject, '評価'],
+  ]);
+  if (err) return err;
+  if (!isPlainObject(p.evaluation)) return null;
+  return firstInvalid(p.evaluation, [
+    ['result', v => v === '' || RESULT_VALUES.includes(v), '結果'],
+    ['actualDuration', v => v === null || isNonNegNumber(v), '実績時間'],
+    ['actualReaction', isStr, '実際の反応'],
+    ['uxActual', v => isUxMap(v, true), 'UX実際'],
+    ['reviews', v => Array.isArray(v) && v.every(r => isPlainObject(r) && isStr(r.reviewer) && isStr(r.note)), '振り返り'],
+    ['nextMemo', isStr, '次回メモ'],
+  ]);
+}
+
+// 問題がなければ null、あればスキップの理由を返す
+function validateImportedWorkshop(raw) {
+  if (!isPlainObject(raw)) return 'ワークショップの形式ではありません';
+  if (!isStr(raw.id) || raw.id.trim() === '') return 'id がありません';
+  if (!isStr(raw.name)) return '名称がありません';
+  if (!STATUSES.includes(raw.status)) return '状態の値が不正です';
+  if (!isIsoString(raw.updatedAt)) return '更新日時がありません';
+  if (!Array.isArray(raw.processes)) return 'プロセスの一覧がありません';
+  const err = firstInvalid(raw, [
+    ['schemaVersion', v => v === SCHEMA_VERSION, '形式のバージョン'],
+    ['date', v => v === '' || (isStr(v) && /^\d{4}-\d{2}-\d{2}$/.test(v)), '開催日'],
+    ['startTime', isClockOrEmpty, '開始時刻'],
+    ['endTime', isClockOrEmpty, '終了時刻'],
+    ['participantCount', v => v === null || isNonNegNumber(v), '参加者人数'],
+    ['participantComposition', isStr, '参加者の特徴'],
+    ['purpose', isStr, 'ワークショップの目的'],
+    ['goal', isStr, 'ワークショップのゴール'],
+    ['overallNote', isStr, '全体の気づき'],
+    ['nextActionNote', isStr, '次回への改善メモ'],
+    ['isSample', v => typeof v === 'boolean', 'サンプルの指定'],
+    ['sampleType', v => v === null || SAMPLE_TYPES.includes(v), 'サンプルの種類'],
+    ['createdAt', isIsoString, '作成日時'],
+    ['uxAxes', v => Array.isArray(v) && v.length >= UX_AXES_MIN && v.length <= UX_AXES_MAX &&
+      v.every(a => isPlainObject(a) && isStr(a.id) && a.id !== '' && isStr(a.label)), 'UXグラフ項目'],
+  ]);
+  if (err) return err;
+  for (let i = 0; i < raw.processes.length; i++) {
+    const pErr = validateImportedProcess(raw.processes[i]);
+    if (pErr) return `プロセス${i + 1}：${pErr}`;
+  }
+  return null;
+}
+
+// 読み込み結果を返す。ファイル自体が読めない場合は { error } を返し、手元のデータには触れない
+function importData(text) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    return { error: 'JSONとして読み込めませんでした。ファイルが壊れているか、JSONではありません。' };
+  }
+  if (!isPlainObject(data) || !Array.isArray(data.workshops)) {
+    return { error: 'WSログの書き出しファイルではありません（ワークショップの一覧が見つかりません）。' };
+  }
+  if (data.schemaVersion !== SCHEMA_VERSION) {
+    return { error: `対応していない形式のバージョンです（このファイル: ${str(data.schemaVersion) || '不明'}、対応: ${SCHEMA_VERSION}）。` };
+  }
+
+  const result = { added: 0, updated: 0, kept: 0, skipped: [], categoriesAdded: [] };
+
+  // ファイル内で同じ id が重複していたら、更新日時が新しいものを使う
+  const incoming = new Map();
+  data.workshops.forEach((raw, i) => {
+    const reason = validateImportedWorkshop(raw);
+    if (reason) {
+      const name = isPlainObject(raw) && isStr(raw.name) && raw.name.trim() ? raw.name.trim() : `${i + 1}件目`;
+      result.skipped.push({ name, reason });
+      return;
+    }
+    const ws = normalizeWorkshop(raw);
+    const prev = incoming.get(ws.id);
+    if (!prev || Date.parse(ws.updatedAt) > Date.parse(prev.updatedAt)) incoming.set(ws.id, ws);
+  });
+
+  // 手元に同じ id があれば、updatedAt が新しいほうを採用する
+  incoming.forEach(ws => {
+    const idx = appData.workshops.findIndex(w => w.id === ws.id);
+    if (idx < 0) {
+      appData.workshops.push(ws);
+      result.added++;
+    } else if (Date.parse(ws.updatedAt) > Date.parse(appData.workshops[idx].updatedAt)) {
+      if (currentWS === appData.workshops[idx]) currentWS = null;
+      appData.workshops[idx] = ws;
+      result.updated++;
+    } else {
+      result.kept++;
+    }
+  });
+
+  // 種別は、手元のリストにないものだけを追加する
+  if (Array.isArray(data.categories)) {
+    data.categories.map(str).map(s => s.trim()).filter(Boolean).forEach(c => {
+      if (!appData.categories.includes(c)) {
+        appData.categories.push(c);
+        result.categoriesAdded.push(c);
+      }
+    });
+  }
+  result.saved = saveAppData();
+  return result;
+}
+
+function importResultMessage(r) {
+  const lines = [
+    `追加 ${r.added}件 ／ 更新 ${r.updated}件 ／ スキップ ${r.skipped.length}件`,
+  ];
+  if (r.kept > 0) lines.push(`手元のほうが新しいか同じため、変更しなかったもの ${r.kept}件`);
+  if (r.categoriesAdded.length) lines.push(`追加した種別：${r.categoriesAdded.join('、')}`);
+  if (r.skipped.length) {
+    lines.push('', 'スキップしたワークショップ（内容に不正な値があったもの）：');
+    r.skipped.slice(0, 10).forEach(s => lines.push(`・${s.name}：${s.reason}`));
+    if (r.skipped.length > 10) lines.push(`ほか${r.skipped.length - 10}件`);
+  }
+  if (!r.saved) lines.push('', '※ ブラウザへの保存に失敗しました。');
+  return lines.join('\n');
+}
+
+async function importFile(file) {
+  if (file.size > IMPORT_MAX_BYTES) {
+    await openModal({ title: '読み込めませんでした', body: 'ファイルが大きすぎます（10MBまで）。', actions: [{ label: '閉じる', value: null, kind: 'primary' }] });
+    return;
+  }
+  flushSave();
+  let text;
+  try {
+    text = await file.text();
+  } catch (e) {
+    text = null;
+  }
+  const result = text === null ? { error: 'ファイルを読み込めませんでした。' } : importData(text);
+  if (result.error) {
+    await openModal({ title: '読み込めませんでした', body: result.error + '\n手元のデータは変更していません。', actions: [{ label: '閉じる', value: null, kind: 'primary' }] });
+    return;
+  }
+  renderHome();
+  await openModal({ title: '読み込み結果', body: importResultMessage(result), actions: [{ label: '閉じる', value: null, kind: 'primary' }] });
+}
+
+document.getElementById('btn-export-selected').addEventListener('click', exportSelected);
+document.getElementById('btn-delete-selected').addEventListener('click', deleteSelected);
+
+// 一覧で☑したワークショップをまとめて削除する（表示中のものだけが対象）
+async function deleteSelected() {
+  flushSave();
+  const list = visibleWorkshops().filter(w => selectedIds.has(w.id)).sort(compareForHome);
+  if (list.length === 0) return;
+  const shown = 10;
+  const names = list.slice(0, shown).map(w => `・${w.name || '無題のワークショップ'}`);
+  if (list.length > shown) names.push(`ほか${list.length - shown}件`);
+  const ok = await confirmDialog(
+    `次の${list.length}件のワークショップを削除します。\nこの操作は元に戻せません。必要なら先に「共有データ出力」で書き出してください。\n\n${names.join('\n')}`,
+    { title: '削除の確認', okLabel: `${list.length}件を削除する`, danger: true });
+  if (!ok) return;
+  const ids = new Set(list.map(w => w.id));
+  appData.workshops = appData.workshops.filter(w => !ids.has(w.id));
+  if (currentWS && ids.has(currentWS.id)) currentWS = null;
+  selectedIds.clear();
+  if (saveAppData()) notify(`${list.length}件のワークショップを削除しました`);
+  renderHome();
+}
+document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', e => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';   // 同じファイルをもう一度選んでも change が起きるように
+  if (file) importFile(file);
+});
+
+// ===== 集計結果の表示（ナレッジ画面・STEP2で共通） =====
+// 集計・検索から元のワークショップへ移動する。評価済みは STEP4、それ以外は状態に応じた画面
+function openFromStats(ws) {
+  if (ws) openWorkshop(ws, ws.status === 'evaluated' ? 'step4' : entryScreenFor(ws));
+}
+
+function bindOpenLinks(container) {
+  container.querySelectorAll('[data-open-ws]').forEach(btn => {
+    btn.addEventListener('click', () => openFromStats(findWorkshop(btn.dataset.openWs)));
+  });
+}
+
+// 各数値には件数を併記し、N が少ないものは「参考」とする（5-5）
+function nNote(n) {
+  return `<span class="stat-n">N=${n}</span>` +
+    (n > 0 && n < CONFIG.minReliableN ? '<span class="weak-tag">参考（件数が少ない）</span>' : '');
+}
+
+function statValue(value, n, format) {
+  return n === 0 || value === null ? '<span class="stat-n">データなし</span>' : `${format(value)}${nNote(n)}`;
+}
+
+function distHtml(s) {
+  if (s.resultN === 0) return '<span class="stat-n">データなし</span>';
+  const seg = (count, color) => count ? `<span style="width:${(count / s.resultN) * 100}%; background:${color};"></span>` : '';
+  return `📈${s.dist.better} ✅${s.dist.as_expected} 📉${s.dist.worse}${nNote(s.resultN)}
+    <div class="dist-bar" aria-hidden="true">${seg(s.dist.better, 'var(--good)')}${seg(s.dist.as_expected, 'var(--main1)')}${seg(s.dist.worse, 'var(--bad)')}</div>`;
+}
+
+const fmtOver = v => `${v > 0 ? '+' : v < 0 ? '−' : '±'}${fmt1(Math.abs(v))}分`;
+
+// 予想のクセは N≥3 のときだけ数値を出し、それ未満は「参考」とする（7-2）
+function biasHtml(b) {
+  if (b.n < CONFIG.minReliableN) {
+    return `<div><b>${esc(b.label)}</b>：<span class="weak-tag">参考（件数が少ない）</span><span class="stat-n">N=${b.n}</span></div>`;
+  }
+  const direction = Math.abs(b.mean) < 0.05 ? '予想とほぼ同じ' : b.mean > 0 ? '実際のほうが高い' : '実際のほうが低い';
+  return `<div><b>${esc(b.label)}</b>：${b.mean > 0 ? '+' : b.mean < 0 ? '−' : '±'}${fmt1(Math.abs(b.mean))}（${direction}）${nNote(b.n)}</div>`;
+}
+
+function recordRowHtml({ ws, p }) {
+  const [cls, label] = RESULT_DISPLAY[p.evaluation.result];
+  const time = p.evaluation.actualDuration === null ? '' : `<span class="stat-n">実績${p.evaluation.actualDuration}分／予定${p.duration}分</span>`;
+  return `
+    <button type="button" class="record-row" data-open-ws="${esc(ws.id)}">
+      <strong>${esc(p.name || '（名称未設定）')}</strong>
+      <span class="stat-n">${esc(ws.name || '無題のワークショップ')}・${esc(ws.date || '日付未設定')}</span>
+      <span class="result-badge ${cls}">${label}</span>${time}
+    </button>`;
+}
+
+// ===== ナレッジ画面（5-5） =====
+document.getElementById('btn-knowledge').addEventListener('click', () => showScreen('knowledge'));
+document.getElementById('btn-knowledge-home').addEventListener('click', () => showScreen('home'));
+document.getElementById('toggle-samples').addEventListener('change', e => {
+  appData.settings.includeSamplesInStats = e.target.checked;
+  saveAppData();
+  renderKnowledge();
+});
+
+let searchTimer = null;
+document.getElementById('knowledge-search').addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(renderSearchResults, 200);
+});
+
+function renderKnowledge() {
+  const workshops = statsWorkshops();
+  const records = processRecords(workshops);
+  document.getElementById('toggle-samples').checked = appData.settings.includeSamplesInStats;
+  document.getElementById('knowledge-banner').innerHTML =
+    appData.settings.includeSamplesInStats && workshops.some(w => w.isSample)
+      ? '<div class="banner info">サンプルを含む集計です。</div>'
+      : '';
+  document.getElementById('knowledge-summary').textContent = workshops.length
+    ? `評価済みのワークショップ ${workshops.length}回・プロセス ${records.length}件を集計しています。`
+    : '集計できる記録がまだありません（評価済みのワークショップが対象です）。';
+
+  const bias = uxBias(records);
+  document.getElementById('knowledge-bias').innerHTML = bias.length
+    ? `<div class="form-note" style="margin:0 0 8px; padding:0;">UXグラフ項目ごとの「実際 − 予想」の平均。正の値は、実際のほうが高かったことを示します。同じ名前の項目どうしで集計しています。</div>
+       <div class="bias-list">${bias.map(biasHtml).join('')}</div>`
+    : '<div class="note-empty">UXの実際が入力された記録がまだありません。</div>';
+
+  const cats = categoryStats(workshops);
+  const catEl = document.getElementById('knowledge-categories');
+  catEl.innerHTML = cats.length ? cats.map((c, i) => `
+    <div class="neumorphic stat-card">
+      <div class="stat-card-head">
+        <span class="stat-card-title">${esc(c.category || UNSET_CATEGORY_LABEL)}</span>
+        <span class="stat-n">記録 ${c.summary.total}件・${c.summary.workshopCount}回のワークショップ</span>
+      </div>
+      <dl class="stat-grid">
+        <div class="stat-item"><dt>結果の分布</dt><dd>${distHtml(c.summary)}</dd></div>
+        <div class="stat-item"><dt>平均の時間超過（実績−予定）</dt><dd>${statValue(c.summary.overAvg, c.summary.timeN, fmtOver)}</dd></div>
+        <div class="stat-item"><dt>バッファ消費率</dt><dd>${statValue(c.summary.bufferUse, c.summary.bufferN, fmtPct)}</dd></div>
+      </dl>
+      ${c.bias.length ? `<div class="stat-sub-title">予想のクセ（実際 − 予想）</div><div class="bias-list">${c.bias.map(biasHtml).join('')}</div>` : ''}
+      <button type="button" class="link-btn" data-toggle-records="${i}">この種別の記録を見る（${c.summary.total}件）</button>
+      <div class="record-list" hidden></div>
+    </div>`).join('') : '<div class="note-empty">表示できる集計はまだありません。</div>';
+
+  catEl.querySelectorAll('[data-toggle-records]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const list = btn.nextElementSibling;
+      if (list.hidden && !list.innerHTML) {
+        const c = cats[Number(btn.dataset.toggleRecords)];
+        list.innerHTML = c.records.slice().sort((a, b) => compareByDateDesc(a.ws, b.ws)).map(recordRowHtml).join('');
+        bindOpenLinks(list);
+      }
+      list.hidden = !list.hidden;
+    });
+  });
+
+  document.getElementById('knowledge-limit').textContent = ENGINE_LIMIT_NOTE;
+  renderSearchResults();
+}
+
+const SEARCH_RESULT_LIMIT = 50;
+
+function renderSearchResults() {
+  const query = document.getElementById('knowledge-search').value;
+  const el = document.getElementById('search-results');
+  const scope = appData.settings.includeSamplesInStats ? '設計中を含むすべてのワークショップ' : '設計中を含むすべてのワークショップ（サンプルを除く）';
+  if (!query.trim()) {
+    el.innerHTML = `<div class="form-note">スペースで区切ると、すべての語を含む記録を探します。対象：${scope}</div>`;
+    return;
+  }
+  const { terms, hits } = searchRecords(query);
+  if (hits.length === 0) {
+    el.innerHTML = `<div class="note-empty">「${esc(query.trim())}」に一致する記録はありません。</div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="search-count">${hits.length}件${hits.length > SEARCH_RESULT_LIMIT ? `（先頭${SEARCH_RESULT_LIMIT}件を表示）` : ''}</div>
+    ${hits.slice(0, SEARCH_RESULT_LIMIT).map(h => `
+      <button type="button" class="search-result" data-open-ws="${esc(h.ws.id)}">
+        <div class="search-result-head">
+          <strong>${esc(h.ws.name || '無題のワークショップ')}</strong>
+          <span class="stat-n">${esc(h.ws.date || '日付未設定')}</span>
+          ${statusBadges(h.ws)}
+        </div>
+        <div class="search-result-head" style="margin-top:2px;">
+          ${h.p ? `${h.p.order}. ${esc(h.p.name || '（名称未設定）')}` : 'ワークショップ全体'}
+        </div>
+        ${h.matches.slice(0, 3).map(([label, text]) => `
+          <div class="search-excerpt"><span class="field">${esc(label)}</span>${excerptHtml(text, terms)}</div>`).join('')}
+      </button>`).join('')}`;
+  bindOpenLinks(el);
+}
+
+// ===== STEP2 過去の記録からの参考情報（7-6） =====
+const R5_EXCERPT_LENGTH = 80;
+
+function renderReferences(ws) {
+  const el = document.getElementById('step2-references');
+  if (ws.processes.length === 0) {
+    el.innerHTML = '<div class="note-empty">プロセスを追加すると、同じ種別の過去の記録が表示されます。</div>';
+    return;
+  }
+  const sampleIncluded = appData.settings.includeSamplesInStats && statsWorkshops(ws.id).some(w => w.isSample);
+
+  const blocks = ws.processes.map((p, i) => {
+    const ref = pastReferenceFor(p, ws);
+    let body;
+    if (ref.state === 'no-category') {
+      body = '<div class="ref-meta">種別を設定すると、過去の記録が表示されます</div>';
+    } else if (ref.state === 'no-data') {
+      body = '<div class="ref-meta">この種別の過去の記録はまだありません</div>';
+    } else {
+      const facts = ref.facts.length ? `<ul class="ref-facts">${ref.facts.map(f => `<li>${esc(f.text)}</li>`).join('')}</ul>` : '';
+      const quotes = ref.excerpts.map(x => {
+        const note = x.note.length > R5_EXCERPT_LENGTH ? x.note.slice(0, R5_EXCERPT_LENGTH) + '…' : x.note;
+        return `
+          <div class="ref-quote">
+            <span class="multiline">「${esc(note)}」</span>
+            <span class="ref-meta">— ${esc(x.reviewer)}（${esc(x.ws.name || '無題のワークショップ')}・${esc(x.ws.date || '日付未設定')}・${esc(x.p.name || '（名称未設定）')}）<button type="button" class="link-btn" data-open-ws="${esc(x.ws.id)}">記録を開く</button></span>
+          </div>`;
+      }).join('');
+      body = `<div class="ref-meta">同じ種別の過去の記録 ${ref.count}件（${ref.workshopCount}回のワークショップ）</div>${facts}${quotes}`;
+    }
+    return `
+      <div class="ref-block">
+        <div class="ref-title">${i + 1}. ${esc(p.name || '（名称未設定）')}${p.category ? `<span class="tag">${esc(p.category)}</span>` : ''}</div>
+        ${body}
+      </div>`;
+  }).join('');
+
+  el.innerHTML =
+    (sampleIncluded ? '<div class="banner info" style="margin-bottom:12px;">サンプルを含む集計です。</div>' : '') +
+    blocks +
+    `<div class="engine-note" style="margin-bottom:0;">${esc(ENGINE_LIMIT_NOTE)}</div>`;
+  bindOpenLinks(el);
+}
+
+// ===== グラフ =====
+// 高DPI（iPhone等）でもぼやけないよう、表示サイズ×devicePixelRatio で描く
+function setupCanvas(canvas, width, height) {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.height = height + 'px';
+  canvas.width  = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  return ctx;
+}
+
+function drawUXChart(canvasId, ws, showActual) {
+  const canvas = document.getElementById(canvasId);
+  const W = canvas.clientWidth;
+  const H = 220;
+  const ctx = setupCanvas(canvas, W, H);
+
+  const ps = ws.processes;
+  if (ps.length === 0 || W === 0) return;
+
+  const pad = { top: 20, right: 20, bottom: 40, left: 36 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const xAt = i => ps.length === 1 ? pad.left + cW / 2 : pad.left + (cW / (ps.length - 1)) * i;
+  const yAt = v => pad.top + cH - ((v - 1) / 4) * cH;
+
+  // グリッドと目盛り（1〜5の位置をそろえる）
+  ctx.strokeStyle = '#d4d4c4'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#9B9B9B'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+  for (let v = 1; v <= 5; v++) {
+    const y = yAt(v);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillText(v, pad.left - 8, y + 4);
+  }
+
+  // プロセス名は、横幅が足りないときは番号だけにする
+  const useNumbers = ps.length > 1 && cW / (ps.length - 1) < 56;
+  ctx.textAlign = 'center';
+  ps.forEach((p, i) => {
+    ctx.fillText(useNumbers || !p.name ? `P${i + 1}` : p.name.slice(0, 6), xAt(i), H - 12);
+  });
+
+  // null の点は描かず、そこで線を途切れさせる
+  function drawSeries(values, color, dashed) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    ctx.setLineDash(dashed ? [6, 4] : []);
+    ctx.beginPath();
+    let drawing = false;
+    values.forEach((v, i) => {
+      if (v === null) { drawing = false; return; }
+      if (drawing) ctx.lineTo(xAt(i), yAt(v));
+      else { ctx.moveTo(xAt(i), yAt(v)); drawing = true; }
+    });
+    ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = color;
+    values.forEach((v, i) => {
+      if (v === null) return;
+      ctx.beginPath(); ctx.arc(xAt(i), yAt(v), dashed ? 3 : 4, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+
+  ws.uxAxes.forEach((axis, i) => {
+    drawSeries(ps.map(p => p.uxExpected[axis.id]), UX_COLORS[i], true);
+    if (showActual) drawSeries(ps.map(p => p.evaluation.uxActual[axis.id]), UX_COLORS[i], false);
+  });
+}
+
+// 区間の幅に合わせて「P1（種別）」→「P1／種別（2段・省略あり）」→「P1」の順に入る形で描く。
+// 幅が足りなければ描かない（図の下の一覧で確認できる）
+function drawDiamondLabel(ctx, number, category, cx, maxWidth, y) {
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#6B6B6B';
+  ctx.font = 'bold 10px sans-serif';
+  if (ctx.measureText(number).width > maxWidth) return;
+
+  if (category) {
+    const oneLine = `${number}（${category}）`;
+    if (ctx.measureText(oneLine).width <= maxWidth) {
+      ctx.fillText(oneLine, cx, y);
+      return;
+    }
+  }
+  ctx.fillText(number, cx, y);
+  if (!category) return;
+
+  ctx.font = '10px sans-serif';
+  ctx.fillStyle = '#9B9B9B';
+  let text = category;
+  while (text.length > 1 && ctx.measureText(text).width > maxWidth) text = text.slice(0, -1);
+  if (text !== category) {
+    while (text.length > 1 && ctx.measureText(text + '…').width > maxWidth) text = text.slice(0, -1);
+    text += '…';
+  }
+  if (ctx.measureText(text).width <= maxWidth) ctx.fillText(text, cx, y + 13);
+}
+
+function uxLegendHtml(ws, showActual) {
+  return ws.uxAxes.map((axis, i) => {
+    const label = esc(axisLabel(axis, i));
+    const color = UX_COLORS[i];
+    const expected = `<div class="legend-item"><span class="legend-line dashed" style="border-top-color:${color};"></span>${label}${showActual ? '（予想）' : ''}</div>`;
+    const actual = `<div class="legend-item"><span class="legend-line" style="border-top-color:${color};"></span>${label}（実際）</div>`;
+    return showActual ? expected + actual : expected;
+  }).join('');
+}
+
+// ダブルダイヤモンドの流れ図。横軸はプロセスの時間（バッファ込み）、縦の広がりは
+// 発散のまとまりで最大まで開き、収束のまとまりで閉じる。未設定のプロセスは直前の広がりを保つ
+function drawDiamondChart(canvasId, ws) {
+  const canvas = document.getElementById(canvasId);
+  const W = canvas.clientWidth;
+  const H = 176;
+  const ctx = setupCanvas(canvas, W, H);
+  const ps = ws.processes;
+  if (ps.length === 0 || W === 0) return;
+
+  const pad = { top: 12, right: 12, bottom: 40, left: 12 };
+  const cW = W - pad.left - pad.right;
+  const mid = pad.top + (H - pad.top - pad.bottom) / 2;
+  const half = (H - pad.top - pad.bottom) / 2;
+
+  // 時間が0のプロセスばかりでも描けるよう、合計0なら等幅にする
+  const minutes = ps.map(p => p.duration + p.bufferAfter);
+  const total = minutes.reduce((a, b) => a + b, 0);
+  const widths = minutes.map(m => total > 0 ? (m / total) * cW : cW / ps.length);
+
+  // まとまりごとの合計時間を求め、まとまり内では時間に比例して広がり（0〜1）を変える
+  const runs = analyzeDiamond(ws).runs;
+  const runOf = i => runs.find(r => i >= r.from && i <= r.to && ps[i].phase === r.phase);
+  const levels = [0];
+  let runStartLevel = 0;
+  let elapsedInRun = 0;
+  let currentRun = null;
+  ps.forEach((p, i) => {
+    const prev = levels[levels.length - 1];
+    const run = p.phase ? runOf(i) : null;
+    if (!run) {
+      levels.push(prev);
+      return;
+    }
+    if (run !== currentRun) {
+      currentRun = run;
+      runStartLevel = prev;
+      elapsedInRun = 0;
+    }
+    elapsedInRun += minutes[i];
+    const target = run.phase === 'diverge' ? 1 : 0;
+    const progress = run.minutes > 0 ? elapsedInRun / run.minutes : (i - run.from + 1) / (run.to - run.from + 1);
+    levels.push(runStartLevel + (target - runStartLevel) * progress);
+  });
+
+  // 中心線
+  ctx.strokeStyle = '#d4d4c4'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(pad.left, mid); ctx.lineTo(W - pad.right, mid); ctx.stroke();
+
+  let x = pad.left;
+  ps.forEach((p, i) => {
+    const x2 = x + widths[i];
+    const y1 = levels[i] * half;
+    const y2 = levels[i + 1] * half;
+    ctx.fillStyle = PHASE_COLORS[p.phase] + (p.phase ? 'CC' : '');
+    ctx.beginPath();
+    ctx.moveTo(x, mid - y1); ctx.lineTo(x2, mid - y2);
+    ctx.lineTo(x2, mid + y2); ctx.lineTo(x, mid + y1);
+    ctx.closePath(); ctx.fill();
+    // 未設定のプロセスは広がりが0だと見えないため、中心線の上に色を付ける
+    if (!p.phase) {
+      ctx.strokeStyle = PHASE_COLORS['']; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(x, mid); ctx.lineTo(x2, mid); ctx.stroke();
+    }
+    // プロセスの区切りと、番号＋プロセス種別のラベル
+    ctx.strokeStyle = '#FFFFEB'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x2, pad.top); ctx.lineTo(x2, H - pad.bottom); ctx.stroke();
+    drawDiamondLabel(ctx, `P${i + 1}`, p.category.trim(), x + widths[i] / 2, widths[i] - 4, H - pad.bottom + 14);
+    x = x2;
+  });
+}
+
+function drawPieChart(canvasId, data, colors) {
+  const canvas = document.getElementById(canvasId);
+  const legend = document.getElementById(canvasId + '-legend');
+  const size = 160;
+  canvas.style.width = size + 'px';
+  const ctx = setupCanvas(canvas, size, size);
+  const cx = size / 2, cy = size / 2, r = 60;
+
+  const total = data.reduce((a, b) => a + b.value, 0);
+  if (total === 0) {
+    ctx.fillStyle = '#d4d4c4';
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+    legend.textContent = 'データなし';
+    return;
+  }
+
+  let startAngle = -Math.PI / 2;
+  data.forEach((d, i) => {
+    const slice = (d.value / total) * Math.PI * 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath(); ctx.fillStyle = colors[i]; ctx.fill();
+    startAngle += slice;
+  });
+
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFEB'; ctx.fill();
+
+  legend.innerHTML = data.map((d, i) =>
+    `<span style="color:${colors[i]};">●</span> ${esc(d.label)}：${Math.round(d.value / total * 100)}%`
+  ).join('　');
+}
+
+function drawPieCharts(ws, suffix) {
+  const ps = ws.processes;
+  drawPieChart('pie-io-' + suffix,
+    [{ label: 'インプット', value: ps.filter(p => p.workType === 'input').length },
+     { label: 'アウトプット', value: ps.filter(p => p.workType === 'output').length }],
+    ['#FFB001', '#454545']);
+  drawPieChart('pie-if-' + suffix,
+    [{ label: '個別', value: ps.filter(p => p.format === 'individual').length },
+     { label: '全体', value: ps.filter(p => p.format === 'group').length }],
+    ['#FFB001CC', '#45454580']);
+}
+
+// 画面幅が変わったら、表示中のグラフを描き直す
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (currentScreen === 'step2') drawStep2Charts();
+    if (currentScreen === 'step4') drawStep4Charts();
+  }, 150);
+});
+
+// ===== 初期化 =====
+renderHome();
+startupNotices.forEach(n => notify(n.message, n.type));
+</script>
+</body>
+</html>
