@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WSログ｜ワークショップ設計サポートツール</title>
+<title>WSログ｜ワークショップ設計の解像度を上げるツール</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -520,7 +520,7 @@
   <div class="header-logo">📋</div>
   <div>
     <div class="header-title">WSログ</div>
-    <div class="header-subtitle">ワークショップ設計サポートツール</div>
+    <div class="header-subtitle">ワークショップ設計の解像度を上げるツール</div>
   </div>
 </div>
 
@@ -529,8 +529,8 @@
   <!-- ホーム -->
   <div id="screen-home" class="screen active">
     <div class="neumorphic home-hero">
-      <h2>プロセスの設計と事後レポートを比較して<br>より効果的なファシリテーションを実現しよう！</h2>
-      <p>事前に設計したプロセスと実際の結果を比較・記録。<br>「このプロセスは効く」という自信を、データで積み上げる。</p>
+      <h2>学びを、次の設計に戻そう</h2>
+      <p>設計時の予想と、実施後の結果・振り返りを貯めて、次の設計中に思い出せるように。<br>正解は一つではなくても、うまくいく理由の解像度は上げていけます。</p>
       <div class="home-actions">
         <button class="neumorphic-btn primary new-btn" id="btn-new-ws">＋ 新しいワークショップ</button>
         <button class="neumorphic-btn new-btn" id="btn-knowledge">📚 ナレッジ</button>
@@ -759,7 +759,7 @@
       </div>
     </div>
 
-    <div class="section-title">プロセス別 答え合わせ</div>
+    <div class="section-title">プロセス別 予想と結果</div>
     <div class="neumorphic compare-wrap">
       <table class="compare-table">
         <thead>
@@ -1695,7 +1695,8 @@ function migrateLegacyWorkshop(old) {
 const SAMPLE_TIMESTAMP = '2026-10-26T00:00:00.000Z';
 
 // 架空サンプル（8-2）。実在の開催記録ではなく、傾向表示の仕組みを見せるためのもの。
-// 3回とも同じ流れ（準備→アイスブレイク→発想→共有→発想→共有）にし、次の参考情報が出るように数値を置いている:
+// 評価済みの3回は同じ流れ（準備→アイスブレイク→発想→共有→発想→共有）にし、次の参考情報が出るように数値を置いている
+// （4件目の「設計済み」サンプルを開くと、これらがSTEP2に表示される）:
 //   R1 アイデア共有: 6回中3回「予想より悪かった」
 //   R2 アイデア発想: 実績が予定より平均+4.7分（+5,+8,+3,+6,+2,+4）
 //   R3 アイスブレイク: バッファ消費率 平均7%（超過 0,1,0分 ／ バッファ5分）
@@ -1740,9 +1741,9 @@ function sampleWorkshop(d) {
     participantCount: d.participantCount,
     participantComposition: d.participantComposition,
     uxAxes: deepCopy(DEFAULT_UX_AXES),
-    status: 'evaluated',
-    overallNote: d.overallNote,
-    nextActionNote: d.nextActionNote,
+    status: d.status || 'evaluated',
+    overallNote: d.overallNote || '',
+    nextActionNote: d.nextActionNote || '',
     isSample: true,
     sampleType: 'fictional',
     createdAt: SAMPLE_TIMESTAMP,
@@ -1861,6 +1862,25 @@ const SAMPLE_FICTIONAL = [
       { ...SAMPLE_FLOW.ideate, result: 'as_expected', actual: 44, uxActual: [4, 3, 3] },
       { ...SAMPLE_FLOW.pitch, result: 'as_expected', actual: 25, uxActual: [3, 2, 4],
         reaction: '担当は決まったが、熱量はいまひとつ', reviews: [['自分', '決める場面での納得感が足りなかった。']] },
+    ],
+  }),
+  // 4件目は「設計済み（まだ実施していない）」。開くとSTEP2が出て、過去3回の記録から参考情報（R1〜R4）がすぐ見える。
+  // 初めて開いた人が、データを入力しなくても「次の設計中に過去の記録が戻ってくる」様子を確かめられるようにしている
+  sampleWorkshop({
+    id: 'sample-fictional-04',
+    status: 'designed',
+    name: '【サンプル】次回予定：新サービスのアイデアソン（設計済み）',
+    date: '2026-11-20', startTime: '13:00', endTime: '16:00', participantCount: 20,
+    participantComposition: '社内の混成メンバー。初対面が半数',
+    purpose: '新サービスの種になる、顧客の困りごととアイデアを持ち帰る',
+    goal: '各チームが、顧客の困りごとを1文で定義し、試したいアイデアを1つ選ぶ',
+    processes: [
+      { ...SAMPLE_FLOW.prep },
+      { ...SAMPLE_FLOW.ice },
+      { ...SAMPLE_FLOW.explore },
+      { ...SAMPLE_FLOW.define },
+      { ...SAMPLE_FLOW.ideate },
+      { ...SAMPLE_FLOW.pitch },
     ],
   }),
 ];
