@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WSログ｜ワークショップ設計の解像度を上げるツール</title>
+<title>ワクログ｜ワークショップ設計の解像度を上げるツール</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -102,6 +102,16 @@
   .screen.active { display: block; }
 
   /* ホーム */
+  .header-bang { color: var(--main1); margin-left: 2px; }
+  .about-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  .about-card { padding: 18px; text-align: left; }
+  .about-card h3 { font-size: 14px; color: var(--main1-dark); margin-bottom: 8px; }
+  .about-card p, .about-card li { font-size: 13px; color: var(--main3-light); line-height: 1.7; }
+  .about-card ul { padding-left: 1.2em; }
+  .about-flow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 0 0 20px; font-size: 12.5px; color: var(--main3-light); }
+  .about-flow span { background: var(--main2); border-radius: 999px; padding: 4px 12px; box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light); }
+  .about-flow b { color: var(--main1-dark); }
+  @media (max-width: 640px) { .about-grid { grid-template-columns: 1fr; } }
   .home-hero { padding: 32px; margin-bottom: 24px; text-align: center; }
   .home-hero h2 { font-size: 22px; color: var(--main1-dark); margin-bottom: 8px; }
   .home-hero p { font-size: 14px; color: var(--main3-light); line-height: 1.6; }
@@ -519,7 +529,7 @@
 <div class="header">
   <div class="header-logo">📋</div>
   <div>
-    <div class="header-title">WSログ</div>
+    <div class="header-title">ワクログ<span class="header-bang">!</span></div>
     <div class="header-subtitle">ワークショップ設計の解像度を上げるツール</div>
   </div>
 </div>
@@ -529,7 +539,7 @@
   <!-- ホーム -->
   <div id="screen-home" class="screen active">
     <div class="neumorphic home-hero">
-      <h2>学びを、次の設計に戻そう</h2>
+      <h2>学びを、次の設計に生かそう</h2>
       <p>設計時の予想と、実施後の結果・振り返りを貯めて、次の設計中に思い出せるように。<br>正解は一つではなくても、うまくいく理由の解像度は上げていけます。</p>
       <div class="home-actions">
         <button class="neumorphic-btn primary new-btn" id="btn-new-ws">＋ 新しいワークショップ</button>
@@ -540,6 +550,26 @@
         <button class="neumorphic-btn sub-btn" id="btn-load-samples">🧪 サンプルを読み込む</button>        <input type="file" id="import-file" accept=".json,application/json" hidden>
       </div>
     </div>
+    <div class="about-grid" id="about">
+      <div class="neumorphic about-card">
+        <h3>誰のどんな課題？</h3>
+        <p>ワークショップを繰り返し設計するファシリテーターは、振り返りを書いても各回のシートに閉じ込められ、次の設計で見返せません。「これで大丈夫か」と不安なまま設計し、引き継ぐ人にも理由が伝わりません。</p>
+      </div>
+      <div class="neumorphic about-card">
+        <h3>どんな価値？</h3>
+        <ul>
+          <li>設計時の予想と、実施後の結果を一か所に貯める</li>
+          <li>次の設計中に、同じ種別の過去の記録が出てくる</li>
+          <li>ナレッジで過去の記録を横断して検索・集計</li>
+          <li>JSONで書き出して、チームに共有</li>
+        </ul>
+      </div>
+      <div class="neumorphic about-card">
+        <h3>どう使う？</h3>
+        <p>まず「サンプルを読み込む」で、記録が入った状態を見られます。データはこのブラウザの中だけに保存され、AIは使っていません。</p>
+      </div>
+    </div>
+    <div class="about-flow" aria-label="使い方の流れ"><span><b>1</b> 設計</span><span><b>2</b> 確認（過去の記録が出る）</span><span><b>3</b> 結果入力</span><span><b>4</b> 振り返り</span></div>
     <div class="section-title">ワークショップ一覧</div>
     <div id="select-toolbar" class="neumorphic select-toolbar">
       <p class="list-note">データはこのブラウザの中だけに保存されます。別の端末で使うときや、ほかの人と共有するときは、一覧で☑したワークショップを「共有データ出力」で書き出し、そのJSONを読み込んでください。</p>      <div class="select-row">
@@ -1865,7 +1895,7 @@ const SAMPLE_FICTIONAL = [
     ],
   }),
   // 4件目は「設計済み（まだ実施していない）」。開くとSTEP2が出て、過去3回の記録から参考情報（R1〜R4）がすぐ見える。
-  // 初めて開いた人が、データを入力しなくても「次の設計中に過去の記録が戻ってくる」様子を確かめられるようにしている
+  // 初めて開いた人が、データを入力しなくても「次の設計中に過去の記録が参考情報として出てくる」様子を確かめられるようにしている
   sampleWorkshop({
     id: 'sample-fictional-04',
     status: 'designed',
@@ -3197,7 +3227,7 @@ function safeFileNamePart(s) {
 }
 
 function exportFileName(ws = null) {
-  return ws ? `wslog-${safeFileNamePart(ws.name)}-${ymd()}.json` : `wslog-${ymd()}.json`;
+  return ws ? `wakulog-${safeFileNamePart(ws.name)}-${ymd()}.json` : `wakulog-${ymd()}.json`;
 }
 
 function downloadJson(payload, fileName) {
@@ -3385,7 +3415,7 @@ function importData(text) {
     return { error: 'JSONとして読み込めませんでした。ファイルが壊れているか、JSONではありません。' };
   }
   if (!isPlainObject(data) || !Array.isArray(data.workshops)) {
-    return { error: 'WSログの書き出しファイルではありません（ワークショップの一覧が見つかりません）。' };
+    return { error: 'ワクログの書き出しファイルではありません（ワークショップの一覧が見つかりません）。' };
   }
   if (data.schemaVersion !== SCHEMA_VERSION) {
     return { error: `対応していない形式のバージョンです（このファイル: ${str(data.schemaVersion) || '不明'}、対応: ${SCHEMA_VERSION}）。` };
