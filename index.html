@@ -103,15 +103,53 @@
 
   /* ホーム */
   .header-bang { color: var(--main1); margin-left: 2px; }
-  .about-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
-  .about-card { padding: 18px; text-align: left; }
-  .about-card h3 { font-size: 14px; color: var(--main1-dark); margin-bottom: 8px; }
-  .about-card p, .about-card li { font-size: 13px; color: var(--main3-light); line-height: 1.7; }
-  .about-card ul { padding-left: 1.2em; }
-  .about-flow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 0 0 20px; font-size: 12.5px; color: var(--main3-light); }
-  .about-flow span { background: var(--main2); border-radius: 999px; padding: 4px 12px; box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light); }
-  .about-flow b { color: var(--main1-dark); }
+  /* アプリ概要 */
+  .about-lead { padding: 24px; margin-bottom: 20px; }
+  .about-lead h2 { font-size: 20px; color: var(--main1-dark); margin-bottom: 8px; }
+  .about-lead p { font-size: 14px; line-height: 1.8; color: var(--main3-light); }
+  .about-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 24px; }
+  .about-card { padding: 20px; text-align: left; }
+  .about-card h3 { font-size: 15px; color: var(--main1-dark); margin-bottom: 8px; }
+  .about-card p, .about-card li { font-size: 13.5px; color: var(--main3-light); line-height: 1.8; }
+  .about-card ul, .about-card ol { padding-left: 1.3em; }
+  .about-card li + li { margin-top: 4px; }
+  .about-card b { color: var(--main3); }
+  .about-steps { display: grid; gap: 12px; margin-bottom: 24px; }
+  .about-step { display: grid; grid-template-columns: 40px 1fr; gap: 12px; padding: 16px 18px; align-items: start; }
+  .about-step .process-number { width: 36px; height: 36px; font-size: 15px; }
+  .about-step h3 { font-size: 15px; margin-bottom: 4px; }
+  .about-step p { font-size: 13.5px; color: var(--main3-light); line-height: 1.8; }
+  .about-figure { font-size: 13px; line-height: 1.9; color: var(--main3-light); background: #FFB00112; border-radius: 12px; padding: 12px 14px; margin-top: 10px; }
+  .about-figure b { color: var(--main1-dark); }
   @media (max-width: 640px) { .about-grid { grid-template-columns: 1fr; } }
+  /* 状態目標 */
+  .goal-list { display: grid; gap: 10px; }
+  .goal-row { display: grid; grid-template-columns: 22px minmax(150px, 210px) 1fr auto; gap: 8px; align-items: center; }
+  .goal-row .goal-key { grid-column: 1; grid-row: 1; }
+  .goal-row .goal-type-wrap { grid-column: 2; grid-row: 1; }
+  .goal-row .goal-text-wrap { grid-column: 3; grid-row: 1; }
+  .goal-row .goal-delete { grid-column: 4; grid-row: 1; }
+  .goal-key { font-weight: bold; color: var(--main1-dark); font-size: 13px; text-align: center; }
+  @media (max-width: 640px) {
+    .goal-row { grid-template-columns: 22px 1fr auto; }
+    .goal-row .goal-delete { grid-column: 3; }
+    .goal-row .goal-text-wrap { grid-column: 2 / -1; grid-row: 2; }
+  }
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip-group .select-btn { flex: 0 1 auto; padding: 8px 12px; font-size: 12px; }
+  .goal-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #FFB00125; color: #8A6A00; margin-right: 4px; white-space: nowrap; }
+  .goal-map-item { padding: 12px 0; border-top: 1px solid var(--shadow-dark); }
+  .goal-map-item:first-of-type { border-top: none; padding-top: 0; }
+  .goal-map-head { font-size: 14px; font-weight: bold; margin-bottom: 6px; word-break: break-word; }
+  .goal-map-procs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+  .goal-map-procs span { border: 1px solid var(--shadow-dark); border-radius: 8px; padding: 3px 8px; background: #ffffff60; }
+  .goal-checks { list-style: none; display: grid; gap: 6px; font-size: 13px; line-height: 1.6; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--shadow-dark); }
+  .goal-checks li::before { content: '△'; color: var(--bad); margin-right: 6px; font-size: 11px; }
+  .goal-checks li.ok::before { content: '○'; color: var(--good); }
+  .goal-eval-card { padding: 20px; margin-bottom: 16px; }
+  .ach-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .ref-subtitle { font-size: 13px; font-weight: bold; color: var(--main1-dark); margin: 4px 0 10px; }
+  .ref-subtitle:not(:first-child) { margin-top: 22px; }
   .home-hero { padding: 32px; margin-bottom: 24px; text-align: center; }
   .home-hero h2 { font-size: 22px; color: var(--main1-dark); margin-bottom: 8px; }
   .home-hero p { font-size: 14px; color: var(--main3-light); line-height: 1.6; }
@@ -540,36 +578,17 @@
   <div id="screen-home" class="screen active">
     <div class="neumorphic home-hero">
       <h2>学びを、次の設計に生かそう</h2>
-      <p>設計時の予想と、実施後の結果・振り返りを貯めて、次の設計中に思い出せるように。<br>正解は一つではなくても、うまくいく理由の解像度は上げていけます。</p>
+      <p>ゴールを、どんなプロセスに落とし込むか。設計時の予想と実施後の結果を貯めて、次の設計に生かせるように。<br>正解は一つではなくても、うまくいく理由の解像度は上げていけます。</p>
       <div class="home-actions">
         <button class="neumorphic-btn primary new-btn" id="btn-new-ws">＋ 新しいワークショップ</button>
         <button class="neumorphic-btn new-btn" id="btn-knowledge">📚 ナレッジ</button>
       </div>
       <div class="home-actions sub">
+        <button class="neumorphic-btn sub-btn" id="btn-about">📖 アプリ概要</button>
         <button class="neumorphic-btn sub-btn" id="btn-import">⬆ 読み込み（JSON）</button>
         <button class="neumorphic-btn sub-btn" id="btn-load-samples">🧪 サンプルを読み込む</button>        <input type="file" id="import-file" accept=".json,application/json" hidden>
       </div>
     </div>
-    <div class="about-grid" id="about">
-      <div class="neumorphic about-card">
-        <h3>誰のどんな課題？</h3>
-        <p>ワークショップを繰り返し設計するファシリテーターは、振り返りを書いても各回のシートに閉じ込められ、次の設計で見返せません。「これで大丈夫か」と不安なまま設計し、引き継ぐ人にも理由が伝わりません。</p>
-      </div>
-      <div class="neumorphic about-card">
-        <h3>どんな価値？</h3>
-        <ul>
-          <li>設計時の予想と、実施後の結果を一か所に貯める</li>
-          <li>次の設計中に、同じ種別の過去の記録が出てくる</li>
-          <li>ナレッジで過去の記録を横断して検索・集計</li>
-          <li>JSONで書き出して、チームに共有</li>
-        </ul>
-      </div>
-      <div class="neumorphic about-card">
-        <h3>どう使う？</h3>
-        <p>まず「サンプルを読み込む」で、記録が入った状態を見られます。データはこのブラウザの中だけに保存され、AIは使っていません。</p>
-      </div>
-    </div>
-    <div class="about-flow" aria-label="使い方の流れ"><span><b>1</b> 設計</span><span><b>2</b> 確認（過去の記録が出る）</span><span><b>3</b> 結果入力</span><span><b>4</b> 振り返り</span></div>
     <div class="section-title">ワークショップ一覧</div>
     <div id="select-toolbar" class="neumorphic select-toolbar">
       <p class="list-note">データはこのブラウザの中だけに保存されます。別の端末で使うときや、ほかの人と共有するときは、一覧で☑したワークショップを「共有データ出力」で書き出し、そのJSONを読み込んでください。</p>      <div class="select-row">
@@ -630,6 +649,12 @@
           <div class="neumorphic-inset">
             <textarea class="form-input" id="ws-goal" rows="2" placeholder="例：チームごとに検証したい課題仮説を1つ持ち帰る"></textarea>
           </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">状態目標（ゴールに向けて、参加者がどんな状態になっていればよいか・1〜3個）</div>
+          <div id="goal-editor" class="goal-list"></div>
+          <button type="button" class="neumorphic-btn add-review-btn" id="btn-add-goal">＋ 状態目標を追加</button>
+          <div class="form-note">ゴール（抽象）とプロセス（具体）の間の段階です。タイプを選んでおくと、次の設計で「同じタイプの状態目標に、過去どのプロセスが効いたか」が出てきます。</div>
         </div>
         <div class="form-group">
           <div class="form-grid-2">
@@ -693,6 +718,9 @@
     <div class="section-title">概要</div>
     <div id="step2-overview" class="neumorphic" style="padding:20px; margin-bottom:24px;"></div>
 
+    <div class="section-title">ゴール → 状態目標 → プロセス</div>
+    <div id="step2-goalmap" class="neumorphic" style="padding:20px; margin-bottom:24px;"></div>
+
     <div class="section-title">タイムテーブル</div>
     <div id="step2-timetable" class="neumorphic timetable"></div>
 
@@ -743,6 +771,8 @@
       <span id="unevaluated-count" style="color:var(--main3-lighter);"></span>
     </div>
     <div id="eval-list"></div>
+    <div class="section-title">状態目標の結果</div>
+    <div id="goal-eval-list"></div>
     <div class="neumorphic" style="padding:20px; margin-bottom:16px;">
       <div class="form-group">
         <label class="form-label" for="overall-note">全体の気づき</label>
@@ -765,6 +795,9 @@
     <div id="step4-header"></div>
     <div class="section-title">結果サマリー</div>
     <div id="step4-summary" class="neumorphic" style="padding:20px; margin-bottom:24px;"></div>
+
+    <div class="section-title">状態目標の予想と結果</div>
+    <div id="step4-goals" class="neumorphic" style="padding:20px; margin-bottom:24px;"></div>
 
     <div class="section-title">タイムテーブル（予定／実績）</div>
     <div id="step4-timetable" class="neumorphic timetable"></div>
@@ -818,6 +851,81 @@
     </div>
   </div>
 
+  <!-- アプリ概要 -->
+  <div id="screen-about" class="screen">
+    <nav class="step-nav knowledge-nav" aria-label="移動">
+      <button type="button" class="neumorphic-btn step-nav-btn" id="btn-about-home">← ホーム</button>
+    </nav>
+    <div class="neumorphic about-lead">
+      <h2>ワクログとは</h2>
+      <p>ワークショップのゴールを、当日のプロセスに落とし込む（抽象→具体）精度を上げるための記録ツールです。設計時の「予想」と実施後の「結果」を貯めて、次の設計に生かします。</p>
+    </div>
+    <div class="about-grid">
+      <div class="neumorphic about-card">
+        <h3>誰のどんな課題？</h3>
+        <p>ワークショップを設計・運営するファシリテーターの課題です。</p>
+        <ul>
+          <li>ゴールは明確でも、それを当日のプロセスに落とし込む精度が上がらない</li>
+          <li>過去の経験が言語化されず、各回のシートに散らばっている</li>
+          <li>そのため設計時に根拠を持てず、改善のサイクルが回らない</li>
+        </ul>
+      </div>
+      <div class="neumorphic about-card">
+        <h3>どんな価値？</h3>
+        <ul>
+          <li>ゴールを<b>状態目標</b>に分け、各プロセスがどれに効くかを書いて設計できる</li>
+          <li>実施後に予想と結果を比べ、<b>どの落とし込みが効いたか</b>が残る</li>
+          <li>次の設計中に、同じタイプの状態目標に<b>過去どのプロセスが効いたか</b>が出てくる</li>
+          <li>JSONで書き出して、チームに共有できる</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title">使い方</div>
+    <div class="about-steps">
+      <div class="neumorphic about-step">
+        <div class="process-number">1</div>
+        <div>
+          <h3>設計：ゴールを状態目標に分け、プロセスにつなぐ</h3>
+          <p>ゴールの下に、参加者がどんな状態になっていればよいか（状態目標）を1〜3個書きます。各プロセスでは、どの状態目標に効かせるかを選び、目的・介入・予想される反応・時間・UXの予想を書きます。</p>
+          <div class="about-figure"><b>ゴール</b>：試したいアイデアを1つ選ぶ<br>└ <b>状態目標</b>：顧客の困りごとが1文で定義されている<br>　　└ <b>プロセス</b>：課題の探索 → 課題の絞り込み</div>
+        </div>
+      </div>
+      <div class="neumorphic about-step">
+        <div class="process-number">2</div>
+        <div>
+          <h3>確認：つながりと、過去の記録を見る</h3>
+          <p>ゴール→状態目標→プロセスの対応表で、どのプロセスにもつながっていない状態目標などを確かめます。過去の記録から、同じタイプの状態目標に効いたプロセスや、同じ種別のプロセスの傾向が出てきます。</p>
+        </div>
+      </div>
+      <div class="neumorphic about-step">
+        <div class="process-number">3</div>
+        <div>
+          <h3>結果入力：実施後に、予想と結果を残す</h3>
+          <p>プロセスごとに結果（予想より良かった／予想通り／悪かった）・実績時間・振り返りを入れます。状態目標ごとに達成度と、効いたプロセスを選びます。スマホからでも入力できます。</p>
+        </div>
+      </div>
+      <div class="neumorphic about-step">
+        <div class="process-number">4</div>
+        <div>
+          <h3>振り返り：どの落とし込みが効いたかを見る</h3>
+          <p>状態目標ごとに「設計でつなげたプロセス」と「実際に効いたプロセス」を並べて見られます。貯まった記録は、ホームの「ナレッジ」で横断して検索・集計できます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-grid">
+      <div class="neumorphic about-card">
+        <h3>まず試すには</h3>
+        <p>ホームの「サンプルを読み込む」で、架空の記録が入った状態を見られます。「【サンプル】次回予定：新サービスのアイデアソン（設計済み）」を開くと、過去3回の記録から参考情報が出る様子を確かめられます。</p>
+      </div>
+      <div class="neumorphic about-card">
+        <h3>データについて</h3>
+        <p>データはこのブラウザの中だけに保存され、外部には送信しません。AIは使わず、保存した記録の集計だけで動きます。別の端末やほかの人と共有するときは、ホームの一覧で選んで「共有データ出力」で書き出し、相手が「読み込み（JSON）」で取り込みます。</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ナレッジ（横断） -->
   <div id="screen-knowledge" class="screen">
     <nav class="step-nav knowledge-nav" aria-label="移動">
@@ -839,6 +947,9 @@
 
     <div class="section-title">予想のクセ（全体）</div>
     <div id="knowledge-bias" class="neumorphic stat-card" style="margin-bottom:24px;"></div>
+
+    <div class="section-title">状態目標のタイプごとの集計</div>
+    <div id="knowledge-goals" class="stat-cards" style="margin-bottom:24px;"></div>
 
     <div class="section-title">種別ごとの集計</div>
     <div id="knowledge-categories" class="stat-cards"></div>
@@ -901,6 +1012,17 @@ const PHASES        = ['diverge', 'converge'];       // ダブルダイヤモン
 const STATUSES      = ['designing', 'designed', 'evaluated'];
 const SAMPLE_TYPES  = ['anonymized', 'fictional'];
 const DEFAULT_REVIEWER = '自分';
+// 状態目標（ゴールとプロセスの間の段階）。タイプは選択式で、過去の記録を引く鍵になる
+const DEFAULT_GOAL_TYPES = ['関係性ができる', '理解・気づきが深まる', '課題が定義される', 'アイデアが広がる', '絞り込み・合意できる', '次の行動が決まる'];
+const STATE_GOALS_MAX = 3;
+const ACHIEVEMENTS = ['achieved', 'partial', 'not'];
+const ACHIEVEMENT_DISPLAY = {
+  achieved: ['ok',   '達成できた'],
+  partial:  ['good', '一部できた'],
+  not:      ['bad',  'できなかった'],
+  '':       ['none', '未評価'],
+};
+const GOAL_KEYS = ['A', 'B', 'C'];
 
 const STATUS_LABELS   = { designing: '設計中', designed: '設計済み', evaluated: '評価済み' };
 const SAMPLE_LABELS   = { anonymized: 'サンプル（実データ由来）', fictional: 'サンプル（架空）' };
@@ -1087,6 +1209,7 @@ function createEmptyAppData() {
     schemaVersion: SCHEMA_VERSION,
     workshops: [],
     categories: DEFAULT_CATEGORIES.slice(),
+    goalTypes: DEFAULT_GOAL_TYPES.slice(),
     settings: { includeSamplesInStats: true },
   };
 }
@@ -1105,6 +1228,7 @@ function createWorkshop() {
     participantCount: null,
     participantComposition: '',     // 画面上の名称は「参加者の特徴」
     uxAxes: deepCopy(DEFAULT_UX_AXES),
+    stateGoals: [],
     status: 'designing',
     overallNote: '',
     nextActionNote: '',
@@ -1123,6 +1247,18 @@ function uxMap(axes, value) {
 function axisLabel(axis, index) {
   return axis.label.trim() || `項目${index + 1}`;
 }
+
+function createGoalEvaluation() {
+  return { achievement: '', effectiveProcessIds: [] };
+}
+
+function createStateGoal() {
+  return { id: newId(), type: '', text: '', evaluation: createGoalEvaluation() };
+}
+
+// 状態目標の表示名（A／B／C は並び順）
+function goalKey(ws, g) { return GOAL_KEYS[ws.stateGoals.indexOf(g)] || '?'; }
+function goalLabel(ws, g) { return `${goalKey(ws, g)}. ${g.text.trim() || '（内容未入力）'}`; }
 
 function createEmptyEvaluation(axes) {
   return {
@@ -1149,6 +1285,7 @@ function createProcess(order, axes) {
     expectedReaction: '',
     duration: 10,
     bufferAfter: 0,
+    stateGoalIds: [],
     uxExpected: uxMap(axes, 3),
     evaluation: createEmptyEvaluation(axes),
   };
@@ -1156,9 +1293,11 @@ function createProcess(order, axes) {
 
 // 設計項目だけを写し、評価は空にする（プロセス複製・ワークショップ複製で共通）。
 // UX予想は、複製先に同じ名前の項目があればその値を引き継ぎ、なければ初期値3にする
-function copyProcessDesign(src, srcAxes, dstAxes) {
+// 状態目標とのつながりは、同じワークショップの複製（keepGoals）のときだけ引き継ぐ
+function copyProcessDesign(src, srcAxes, dstAxes, keepGoals = false) {
   const p = deepCopy(src);
   p.id = newId();
+  p.stateGoalIds = keepGoals ? (src.stateGoalIds || []).slice() : [];
   p.uxExpected = Object.fromEntries(dstAxes.map(dst => {
     const match = srcAxes.find(a => a.id === dst.id && a.label === dst.label) || srcAxes.find(a => a.label.trim() !== '' && a.label === dst.label);
     return [dst.id, match ? src.uxExpected[match.id] ?? 3 : 3];
@@ -1180,7 +1319,8 @@ function duplicateWorkshop(src) {
     sampleType: null,
     createdAt: now,
     updatedAt: now,
-    processes: src.processes.map(p => copyProcessDesign(p, src.uxAxes, ws.uxAxes)),
+    stateGoals: src.stateGoals.map(g => ({ id: g.id, type: g.type, text: g.text, evaluation: createGoalEvaluation() })),
+    processes: src.processes.map(p => copyProcessDesign(p, src.uxAxes, ws.uxAxes, true)),
   });
   return ws;
 }
@@ -1449,6 +1589,109 @@ function pastReferenceFor(p, ws) {
   return { state: 'ok', category, count: s.total, workshopCount: s.workshopCount, facts, excerpts };
 }
 
+// ===== 状態目標の集計 =====
+// 状態目標はタイプ（正規化）で突き合わせる。「効いたプロセス」は、そのプロセスの種別ごとにまとめる
+function goalRecords(workshops) {
+  return workshops.flatMap(ws => ws.stateGoals.filter(g => g.type.trim()).map(g => ({ ws, g })));
+}
+
+function summarizeGoalRecords(records) {
+  const withAch = records.filter(r => r.g.evaluation.achievement !== '');
+  const dist = { achieved: 0, partial: 0, not: 0 };
+  withAch.forEach(r => { dist[r.g.evaluation.achievement]++; });
+  const eff = new Map();
+  records.forEach(({ ws, g }) => {
+    g.evaluation.effectiveProcessIds.forEach(pid => {
+      const p = ws.processes.find(x => x.id === pid);
+      if (!p) return;
+      const category = p.category.trim() || UNSET_CATEGORY_LABEL;
+      if (!eff.has(category)) eff.set(category, { category, count: 0, names: new Map() });
+      const e = eff.get(category);
+      e.count++;
+      const name = p.name.trim() || '（名称未設定）';
+      e.names.set(name, (e.names.get(name) || 0) + 1);
+    });
+  });
+  return {
+    total: records.length,
+    workshopCount: new Set(records.map(r => r.ws.id)).size,
+    achN: withAch.length,
+    dist,
+    effective: Array.from(eff.values()).sort((a, b) => b.count - a.count || a.category.localeCompare(b.category, 'ja')),
+  };
+}
+
+function goalTypeStats(workshops) {
+  const groups = new Map();
+  goalRecords(workshops).forEach(r => {
+    const key = labelKey(r.g.type);
+    if (!groups.has(key)) groups.set(key, { type: r.g.type.trim(), records: [] });
+    groups.get(key).records.push(r);
+  });
+  const rank = type => { const i = appData.goalTypes.indexOf(type); return i < 0 ? appData.goalTypes.length : i; };
+  return Array.from(groups.values(), g => ({ ...g, summary: summarizeGoalRecords(g.records) }))
+    .sort((a, b) => rank(a.type) - rank(b.type) || a.type.localeCompare(b.type, 'ja'));
+}
+
+// 「アイデア発想 2回（課題の探索×2）」の形で、効いたプロセスを並べる
+function effectiveListHtml(effective, limit = 3) {
+  if (effective.length === 0) return '<span class="stat-n">効いたプロセスの記録なし</span>';
+  return effective.slice(0, limit).map(e => {
+    const names = Array.from(e.names.entries()).sort((a, b) => b[1] - a[1]).map(([n, c]) => `${esc(n)}${c > 1 ? `×${c}` : ''}`).join('、');
+    return `<div><b>${esc(e.category)}</b> ${e.count}回<span class="stat-n">（${names}）</span></div>`;
+  }).join('');
+}
+
+// STEP2の参考情報（状態目標）。同じタイプの過去の状態目標について、達成度と効いたプロセスを事実として出す
+function pastGoalReferenceFor(g, ws) {
+  if (!g.type.trim()) return { state: 'no-type' };
+  const key = labelKey(g.type);
+  const records = goalRecords(statsWorkshops(ws.id)).filter(r => labelKey(r.g.type) === key);
+  if (records.length === 0) return { state: 'no-data' };
+  const s = summarizeGoalRecords(records);
+  const facts = [];
+  if (s.achN > 0) facts.push(`過去${s.achN}回の結果：達成できた ${s.dist.achieved} ／ 一部できた ${s.dist.partial} ／ できなかった ${s.dist.not}`);
+  // 過去に2回以上効いた種別が、この設計ではこの状態目標につながっていなければ知らせる（理由は断定しない）
+  const linkedCats = new Set(ws.processes.filter(p => p.stateGoalIds.includes(g.id)).map(p => p.category.trim()).filter(Boolean));
+  s.effective
+    .filter(e => e.count >= 2 && e.category !== UNSET_CATEGORY_LABEL && !linkedCats.has(e.category))
+    .forEach(e => facts.push(`過去に${e.count}回効いた種別「${e.category}」のプロセスは、この設計ではこの状態目標につながっていません`));
+  return { state: 'ok', s, facts, records };
+}
+
+// ゴール→状態目標→プロセスのつながりの確認（構造化された項目だけで判定する）
+const NARROWING_GOAL_TYPES = ['絞り込み・合意できる', '次の行動が決まる'];
+const WIDENING_GOAL_TYPES = ['アイデアが広がる'];
+
+function linkedProcesses(ws, g) {
+  return ws.processes.filter(p => p.stateGoalIds.includes(g.id));
+}
+
+function goalChecks(ws) {
+  const out = [];
+  ws.stateGoals.forEach(g => {
+    const key = goalKey(ws, g);
+    const linked = linkedProcesses(ws, g);
+    if (!g.text.trim()) out.push(`状態目標${key}の内容が未入力です`);
+    if (!g.type.trim()) out.push(`状態目標${key}のタイプが未設定です（設定すると、過去の記録と比べられます）`);
+    if (linked.length === 0) {
+      out.push(`状態目標${key}につながるプロセスがありません`);
+      return;
+    }
+    if (NARROWING_GOAL_TYPES.includes(g.type) && linked.every(p => p.phase === 'diverge')) {
+      out.push(`状態目標${key}（${g.type}）につながるプロセスは、すべて「発散」です`);
+    }
+    if (WIDENING_GOAL_TYPES.includes(g.type) && linked.every(p => p.phase === 'converge')) {
+      out.push(`状態目標${key}（${g.type}）につながるプロセスは、すべて「収束」です`);
+    }
+  });
+  const unlinked = ws.processes.filter(p => p.stateGoalIds.length === 0);
+  if (ws.stateGoals.length > 0 && unlinked.length > 0) {
+    out.push(`どの状態目標にもつながっていないプロセス：${unlinked.map(p => `P${p.order} ${p.name || '（名称未設定）'}`).join('、')}（準備やオープニングなら問題ありません）`);
+  }
+  return out;
+}
+
 // ===== キーワード検索（7-5） =====
 function searchTerms(query) {
   return Array.from(new Set(normalizeText(query).split(/\s+/).filter(Boolean)));
@@ -1464,6 +1707,7 @@ function searchDocuments() {
         fields: [
           ['ワークショップの目的', ws.purpose],
           ['ワークショップのゴール', ws.goal],
+          ...ws.stateGoals.map(g => [`状態目標${goalKey(ws, g)}${g.type ? `（${g.type}）` : ''}`, g.text]),
           ['全体の気づき', ws.overallNote],
           ['次回への改善メモ', ws.nextActionNote],
         ],
@@ -1605,6 +1849,7 @@ function normalizeProcess(raw, index, axes) {
     expectedReaction: str(raw.expectedReaction),
     duration: nonNegInt(raw.duration, 10),
     bufferAfter: nonNegInt(raw.bufferAfter, 0),
+    stateGoalIds: Array.isArray(raw.stateGoalIds) ? Array.from(new Set(raw.stateGoalIds.map(str).filter(Boolean))) : [],
     uxExpected: Object.fromEntries(axes.map(a => [a.id, uxValue(uxE[a.id], 3)])),
     evaluation: {
       result: oneOf(ev.result, RESULT_VALUES, ''),
@@ -1629,6 +1874,28 @@ function normalizeWorkshop(raw) {
     .map((p, i) => ({ p, i, order: toNumber(p.order) ?? i }))
     .sort((a, b) => a.order - b.order || a.i - b.i)
     .map(({ p }, i) => normalizeProcess(p, i, uxAxes));
+  // 状態目標は最大3個。プロセス側・評価側の参照は、存在するものだけを残す
+  const seenGoal = new Set();
+  const stateGoals = (Array.isArray(raw.stateGoals) ? raw.stateGoals : [])
+    .filter(isPlainObject)
+    .map(g => {
+      const ev = isPlainObject(g.evaluation) ? g.evaluation : {};
+      return {
+        id: str(g.id) || newId(),
+        type: str(g.type).trim(),
+        text: str(g.text),
+        evaluation: {
+          achievement: oneOf(ev.achievement, ACHIEVEMENTS, ''),
+          effectiveProcessIds: Array.isArray(ev.effectiveProcessIds) ? Array.from(new Set(ev.effectiveProcessIds.map(str).filter(Boolean))) : [],
+        },
+      };
+    })
+    .filter(g => !seenGoal.has(g.id) && seenGoal.add(g.id))
+    .slice(0, STATE_GOALS_MAX);
+  const goalIds = new Set(stateGoals.map(g => g.id));
+  const processIds = new Set(processes.map(p => p.id));
+  processes.forEach(p => { p.stateGoalIds = p.stateGoalIds.filter(id => goalIds.has(id)); });
+  stateGoals.forEach(g => { g.evaluation.effectiveProcessIds = g.evaluation.effectiveProcessIds.filter(id => processIds.has(id)); });
   const createdAt = isoOr(raw.createdAt, now);
   const clock = v => /^\d{2}:\d{2}$/.test(v) ? v : '';
   return {
@@ -1643,6 +1910,7 @@ function normalizeWorkshop(raw) {
     participantCount: nonNegInt(raw.participantCount, null),
     participantComposition: str(raw.participantComposition),
     uxAxes,
+    stateGoals,
     status: oneOf(raw.status, STATUSES, 'designing'),
     overallNote: str(raw.overallNote),
     nextActionNote: str(raw.nextActionNote),
@@ -1661,6 +1929,10 @@ function normalizeAppData(raw) {
     const list = raw.categories.map(str).map(s => s.trim()).filter(Boolean);
     if (list.length) data.categories = Array.from(new Set(list));
     if (data.categories.join('\n') === PREVIOUS_DEFAULT_CATEGORIES.join('\n')) data.categories = DEFAULT_CATEGORIES.slice();
+  }
+  if (Array.isArray(raw.goalTypes)) {
+    const list = raw.goalTypes.map(str).map(s => s.trim()).filter(Boolean);
+    if (list.length) data.goalTypes = Array.from(new Set(list));
   }
   if (isPlainObject(raw.settings) && typeof raw.settings.includeSamplesInStats === 'boolean') {
     data.settings.includeSamplesInStats = raw.settings.includeSamplesInStats;
@@ -1722,7 +1994,9 @@ function migrateLegacyWorkshop(old) {
 // 固定の id を持ち、読み込み直すときは同じ id のサンプルだけを置き換え、利用者のデータには触れない。
 // 名前の先頭に【サンプル】を付けて区別する。
 // 実データ由来のサンプル（8-1）は、固有名や個人のコメントが残っていたため組み込まない
-const SAMPLE_TIMESTAMP = '2026-10-26T00:00:00.000Z';
+const SAMPLE_TIMESTAMP = '2026-10-27T00:00:00.000Z';
+// 以前の版のサンプル。手を加えていない（更新日時が当時のまま）ものは、起動時に新しい版へ置き換える
+const PREVIOUS_SAMPLE_TIMESTAMPS = ['2026-10-26T00:00:00.000Z'];
 
 // 架空サンプル（8-2）。実在の開催記録ではなく、傾向表示の仕組みを見せるためのもの。
 // 評価済みの3回は同じ流れ（準備→アイスブレイク→発想→共有→発想→共有）にし、次の参考情報が出るように数値を置いている
@@ -1746,6 +2020,7 @@ function sampleProcess(wsId, order, d) {
     expectedReaction: d.expected || '',
     duration: d.duration,
     bufferAfter: d.buffer || 0,
+    stateGoalIds: (d.goals || []).map(k => `${wsId}-${k}`),
     uxExpected: ux(d.ux),
     evaluation: {
       result: d.result || '',
@@ -1771,6 +2046,16 @@ function sampleWorkshop(d) {
     participantCount: d.participantCount,
     participantComposition: d.participantComposition,
     uxAxes: deepCopy(DEFAULT_UX_AXES),
+    // 状態目標: { key, type, text, ach, eff: [効いたプロセスの番号] }
+    stateGoals: (d.stateGoals || []).map(g => ({
+      id: `${d.id}-${g.key}`,
+      type: g.type,
+      text: g.text,
+      evaluation: {
+        achievement: g.ach || '',
+        effectiveProcessIds: (g.eff || []).map(n => `${d.id}-p${String(n).padStart(2, '0')}`),
+      },
+    })),
     status: d.status || 'evaluated',
     overallNote: d.overallNote || '',
     nextActionNote: d.nextActionNote || '',
@@ -1785,36 +2070,36 @@ function sampleWorkshop(d) {
 // 3回で共通の設計部分
 const SAMPLE_FLOW = {
   prep: {
-    name: '会場準備・受付', category: '準備', duration: 20,
+    name: '会場準備・受付', category: '準備', duration: 20, goals: [],
     aim: '迷わず着席でき、始まる前から話しやすい空気をつくる',
     intervention: '入口で名札を渡し、近くの人と一言交わすよう声をかける',
   },
   ice: {
-    name: '自己紹介ワーク', category: 'アイスブレイク', workType: 'output', format: 'group', duration: 15, buffer: 5,
+    name: '自己紹介ワーク', category: 'アイスブレイク', workType: 'output', format: 'group', duration: 15, buffer: 5, goals: ['g1'],
     aim: '初対面同士の緊張をほぐし、話す・聞くの練習をする',
     intervention: '最初にファシリが自分の失敗談を話し、ハードルを下げる',
     expected: '最初はぎこちないが、後半は笑いが出る', ux: [3, 3, 4],
   },
   explore: {
-    name: '課題の探索', category: 'アイデア発想', phase: 'diverge', workType: 'output', format: 'individual', duration: 30, buffer: 5,
+    name: '課題の探索', category: 'アイデア発想', phase: 'diverge', workType: 'output', format: 'individual', duration: 30, buffer: 5, goals: ['g2'],
     aim: '思い込みを外し、困りごとの候補をたくさん出す',
     intervention: '付箋1枚に1つ。質より量と伝え、手が止まった人に問いを投げる',
     expected: '前半は手が止まるが、他人の付箋を見て増えていく', ux: [3, 3, 3],
   },
   define: {
-    name: '課題の絞り込み', category: 'アイデア共有', phase: 'converge', workType: 'output', format: 'group', duration: 20,
+    name: '課題の絞り込み', category: 'アイデア共有', phase: 'converge', workType: 'output', format: 'group', duration: 20, goals: ['g2'],
     aim: '出た困りごとを共有し、取り組む課題を1つに決める',
     intervention: '決めきれないチームには「誰が一番困っているか」で選ぶよう促す',
     expected: '意見が割れるチームが出るが、時間内に決まる', ux: [3, 4, 3],
   },
   ideate: {
-    name: 'アイデア発想', category: 'アイデア発想', phase: 'diverge', workType: 'output', format: 'group', duration: 40, buffer: 10,
+    name: 'アイデア発想', category: 'アイデア発想', phase: 'diverge', workType: 'output', format: 'group', duration: 40, buffer: 10, goals: ['g3'],
     aim: '決めた課題に対して、解決アイデアを広く出す',
     intervention: '10分ごとに発想のきっかけカードを配る',
     expected: '盛り上がり、時間が足りないと感じるチームが出る', ux: [4, 3, 3],
   },
   pitch: {
-    name: '発表と選定', category: 'アイデア共有', phase: 'converge', workType: 'output', format: 'group', duration: 25, buffer: 5,
+    name: '発表と選定', category: 'アイデア共有', phase: 'converge', workType: 'output', format: 'group', duration: 25, buffer: 5, goals: ['g3'],
     aim: 'アイデアを発表し合い、持ち帰るアイデアを選ぶ',
     intervention: '発表は1チーム2分。聞き手は良い点を付箋で返す',
     expected: '発表で他チームから刺激を受け、満足して終わる', ux: [3, 4, 3],
@@ -1831,6 +2116,11 @@ const SAMPLE_FICTIONAL = [
     goal: '各チームが「誰のどんな困りごとか」を1文で定義し、解決アイデアを1つ発表する',
     overallNote: '前半の発散はよく動いたが、共有の場面で時間が押した。発表の型を先に示すと良さそう。',
     nextActionNote: '課題の絞り込みに使う判断基準を、ワークシートに印刷しておく。',
+    stateGoals: [
+      { key: 'g1', type: '関係性ができる', text: '部署の違う初対面同士が、気軽に意見を言い合えている', ach: 'achieved', eff: [2] },
+      { key: 'g2', type: '課題が定義される', text: '「誰のどんな困りごとか」が1文で定義されている', ach: 'partial', eff: [3] },
+      { key: 'g3', type: '絞り込み・合意できる', text: '発表するアイデアを、チームで納得して1つ選べている', ach: 'partial', eff: [6] },
+    ],
     processes: [
       { ...SAMPLE_FLOW.prep, result: 'as_expected', actual: 20 },
       { ...SAMPLE_FLOW.ice, result: 'as_expected', actual: 15, uxActual: [4, 3, 3],
@@ -1857,6 +2147,11 @@ const SAMPLE_FICTIONAL = [
     goal: '各チームが、来月の地域イベントで試せるアイデアを1つ持ち帰る',
     overallNote: '当事者の話が出たことで課題が具体的になった。発散の時間がもう少し欲しかった。',
     nextActionNote: '課題の探索を40分に延ばし、その分アイスブレイクを短くする。',
+    stateGoals: [
+      { key: 'g1', type: '関係性ができる', text: '学生と社会人が、立場を気にせず話せている', ach: 'achieved', eff: [2] },
+      { key: 'g2', type: '課題が定義される', text: '当事者目線の困りごとが、チームで1つに定まっている', ach: 'achieved', eff: [3, 4] },
+      { key: 'g3', type: '絞り込み・合意できる', text: '地域イベントで試すアイデアを、チームで1つ選べている', ach: 'achieved', eff: [5, 6] },
+    ],
     processes: [
       { ...SAMPLE_FLOW.prep, result: 'as_expected', actual: 20 },
       { ...SAMPLE_FLOW.ice, result: 'better', actual: 16, uxActual: [3, 3, 2],
@@ -1880,6 +2175,11 @@ const SAMPLE_FICTIONAL = [
     goal: '次の四半期に試す改善案を3つに絞り、担当を決める',
     overallNote: '顔見知り同士なので立ち上がりは早かった。絞り込みで部署の利害がぶつかり、まとまりに欠けた。',
     nextActionNote: '共有の場面では、ファシリが論点を整理して見える化する。',
+    stateGoals: [
+      { key: 'g1', type: '関係性ができる', text: '部署の立場を離れて、率直に話せている', ach: 'achieved', eff: [2] },
+      { key: 'g2', type: '課題が定義される', text: '顧客が離れていく場面が、部署横断で特定されている', ach: 'not', eff: [] },
+      { key: 'g3', type: '次の行動が決まる', text: '次の四半期に試す改善案3つと担当が決まっている', ach: 'partial', eff: [6] },
+    ],
     processes: [
       { ...SAMPLE_FLOW.prep, result: 'as_expected', actual: 20 },
       { ...SAMPLE_FLOW.ice, result: 'as_expected', actual: 14, uxActual: [4, 4, 3],
@@ -1904,19 +2204,40 @@ const SAMPLE_FICTIONAL = [
     participantComposition: '社内の混成メンバー。初対面が半数',
     purpose: '新サービスの種になる、顧客の困りごととアイデアを持ち帰る',
     goal: '各チームが、顧客の困りごとを1文で定義し、試したいアイデアを1つ選ぶ',
+    // 「発表と選定」を状態目標につなげ忘れた設計にしてあり、STEP2の確認でつながりの抜けが見える
+    stateGoals: [
+      { key: 'g1', type: '関係性ができる', text: '初対面同士が、気軽に話せている' },
+      { key: 'g2', type: '課題が定義される', text: '顧客の困りごとが、チームで1文に定義されている' },
+      { key: 'g3', type: '絞り込み・合意できる', text: '試したいアイデアを、チームで納得して1つ選べている' },
+    ],
     processes: [
       { ...SAMPLE_FLOW.prep },
       { ...SAMPLE_FLOW.ice },
       { ...SAMPLE_FLOW.explore },
       { ...SAMPLE_FLOW.define },
       { ...SAMPLE_FLOW.ideate },
-      { ...SAMPLE_FLOW.pitch },
+      { ...SAMPLE_FLOW.pitch, goals: [] },
     ],
   }),
 ];
 
 function buildSampleWorkshops() {
   return SAMPLE_FICTIONAL.map(normalizeWorkshop).filter(Boolean);
+}
+
+// 手を加えていない古い版のサンプルだけを新しい版に置き換える（利用者のデータと、編集したサンプルには触れない）
+function upgradeUnmodifiedSamples(data) {
+  const fresh = new Map(buildSampleWorkshops().map(s => [s.id, s]));
+  let count = 0;
+  data.workshops = data.workshops.map(w => {
+    const next = fresh.get(w.id);
+    if (next && w.isSample && PREVIOUS_SAMPLE_TIMESTAMPS.includes(w.updatedAt)) {
+      count++;
+      return next;
+    }
+    return w;
+  });
+  return count;
 }
 
 async function loadSamples() {
@@ -1957,7 +2278,9 @@ function loadAppData() {
     try {
       const parsed = JSON.parse(raw);
       if (!isPlainObject(parsed)) throw new Error('unexpected shape');
-      return normalizeAppData(parsed);
+      const data = normalizeAppData(parsed);
+      if (upgradeUnmodifiedSamples(data) > 0) writeAppData(data);
+      return data;
     } catch (e) {
       // 壊れたデータを上書きしないよう、別キーに退避してから空で始める
       const backupKey = `${CONFIG.storageKey}.broken-${Date.now()}`;
@@ -2046,6 +2369,7 @@ const SCREEN_RENDERERS = {
   step3: renderStep3,
   step4: renderStep4,
   knowledge: renderKnowledge,
+  about: () => {},
 };
 
 function showScreen(name) {
@@ -2247,9 +2571,86 @@ function renderStep1() {
   renderTimeSelect('ws-end', ws.endTime);
   document.getElementById('ws-count').value       = ws.participantCount ?? '';
   document.getElementById('ws-composition').value = ws.participantComposition;
+  renderGoalEditor();
   renderAxesEditor();
   renderProcessList();
 }
+
+// ===== 状態目標（ワークショップごと・最大3個） =====
+const ADD_GOAL_TYPE_VALUE = '__add_goal_type__';
+
+function goalTypeOptions(selected) {
+  const list = appData.goalTypes.slice();
+  if (selected && !list.includes(selected)) list.push(selected);
+  return `<option value="" ${selected === '' ? 'selected' : ''}>（タイプ未設定）</option>` +
+    list.map(c => `<option value="${esc(c)}" ${c === selected ? 'selected' : ''}>${esc(c)}</option>`).join('') +
+    `<option value="${ADD_GOAL_TYPE_VALUE}">＋ タイプを追加…</option>`;
+}
+
+function renderGoalEditor() {
+  const ws = currentWS;
+  const editor = document.getElementById('goal-editor');
+  document.getElementById('btn-add-goal').disabled = ws.stateGoals.length >= STATE_GOALS_MAX;
+  if (ws.stateGoals.length === 0) {
+    editor.innerHTML = '<div class="form-note" style="margin:0;">まだありません。「＋ 状態目標を追加」から書けます。</div>';
+    return;
+  }
+  editor.innerHTML = ws.stateGoals.map((g, i) => `
+    <div class="goal-row" data-goal="${i}">
+      <span class="goal-key">${GOAL_KEYS[i]}</span>
+      <div class="neumorphic-inset goal-type-wrap"><select class="form-input goal-type-input" aria-label="状態目標${GOAL_KEYS[i]}のタイプ">${goalTypeOptions(g.type)}</select></div>
+      <button type="button" class="neumorphic-btn delete-btn goal-delete">削除</button>
+      <div class="neumorphic-inset goal-text-wrap"><input class="form-input goal-text-input" type="text" value="${esc(g.text)}" placeholder="例：顧客の困りごとが、チームで1文に定義されている" aria-label="状態目標${GOAL_KEYS[i]}の内容"></div>
+    </div>`).join('');
+
+  editor.querySelectorAll('.goal-row').forEach(row => {
+    const g = ws.stateGoals[Number(row.dataset.goal)];
+    row.querySelector('.goal-type-input').addEventListener('change', async e => {
+      if (e.target.value === ADD_GOAL_TYPE_VALUE) {
+        const name = await promptDialog('状態目標のタイプを追加', { placeholder: '例：自分ごと化できる', okLabel: '追加' });
+        if (name) {
+          if (!appData.goalTypes.includes(name)) appData.goalTypes.push(name);
+          g.type = name;
+          touch();
+        }
+        renderGoalEditor();
+        return;
+      }
+      g.type = e.target.value;
+      touch();
+    });
+    const text = row.querySelector('.goal-text-input');
+    text.addEventListener('input', () => { g.text = text.value; touch(); });
+    // プロセス側の選択肢の表示名にも反映する（入力中に作り直さないよう、確定時に）
+    text.addEventListener('change', renderProcessList);
+    row.querySelector('.goal-delete').addEventListener('click', async () => {
+      const linked = linkedProcesses(ws, g).length;
+      const evaluated = g.evaluation.achievement !== '' || g.evaluation.effectiveProcessIds.length > 0;
+      if (linked > 0 || evaluated) {
+        const msg = `状態目標${goalKey(ws, g)}を削除します。` +
+          (linked > 0 ? `\nつなげているプロセス（${linked}件）とのつながりも外れます。` : '') +
+          (evaluated ? '\n入力済みの達成度・効いたプロセスも消えます。' : '');
+        if (!(await confirmDialog(msg, { okLabel: '削除する', danger: true }))) return;
+      }
+      ws.stateGoals.splice(ws.stateGoals.indexOf(g), 1);
+      ws.processes.forEach(p => { p.stateGoalIds = p.stateGoalIds.filter(id => id !== g.id); });
+      touch();
+      renderGoalEditor();
+      renderProcessList();
+    });
+  });
+}
+
+document.getElementById('btn-add-goal').addEventListener('click', () => {
+  const ws = currentWS;
+  if (ws.stateGoals.length >= STATE_GOALS_MAX) return;
+  ws.stateGoals.push(createStateGoal());
+  touch();
+  renderGoalEditor();
+  renderProcessList();
+  const inputs = document.querySelectorAll('#goal-editor .goal-text-input');
+  inputs[inputs.length - 1].focus();
+});
 
 // 予定の実施時間（開始〜終了）と、プロセスを積み上げた合計を並べて表示する
 function updateDesignSummary() {
@@ -2484,6 +2885,12 @@ function renderProcessList() {
           ${p.category === '' ? '<div class="form-note warn">種別が未設定です（設定すると、過去の記録と比べられます）</div>' : ''}
         </div>
         <div class="type-row">
+          <div class="form-label">効かせたい状態目標（複数可）</div>
+          ${currentWS.stateGoals.length
+            ? `<div class="chip-group">${currentWS.stateGoals.map(g => `<button type="button" class="neumorphic-btn select-btn ${p.stateGoalIds.includes(g.id) ? 'is-selected' : ''}" data-goal-link="${esc(g.id)}">${esc(goalLabel(currentWS, g))}</button>`).join('')}</div>`
+            : '<div class="form-note" style="margin:0;">基本情報で状態目標を書くと、ここで選べます</div>'}
+        </div>
+        <div class="type-row">
           <div class="form-label">タイプ</div>
           <div class="select-group">
             <button type="button" class="neumorphic-btn select-btn ${p.workType === 'input'  ? 'is-selected' : ''}" data-type="workType" data-value="input">インプット</button>
@@ -2597,6 +3004,9 @@ function renderProcessList() {
         if (!ok) return;
       }
       ps.splice(ps.indexOf(p), 1);
+      currentWS.stateGoals.forEach(g => {
+        g.evaluation.effectiveProcessIds = g.evaluation.effectiveProcessIds.filter(id => id !== p.id);
+      });
       renumber(currentWS);
       touch();
       renderProcessList();
@@ -2619,7 +3029,16 @@ function renderProcessList() {
     });
 
     // 選択式の項目は、選択中のボタンをもう一度押すと未設定に戻る
-    card.querySelectorAll('.select-btn').forEach(btn => {
+    card.querySelectorAll('[data-goal-link]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.goalLink;
+        p.stateGoalIds = p.stateGoalIds.includes(id) ? p.stateGoalIds.filter(x => x !== id) : [...p.stateGoalIds, id];
+        touch();
+        btn.classList.toggle('is-selected', p.stateGoalIds.includes(id));
+      });
+    });
+
+    card.querySelectorAll('.select-btn[data-type]').forEach(btn => {
       btn.addEventListener('click', () => {
         const field = btn.dataset.type;
         p[field] = p[field] === btn.dataset.value ? '' : btn.dataset.value;
@@ -2737,6 +3156,7 @@ function renderStep2() {
       ${items.map(([k, v, cls = '']) => `<div class="overview-item ${cls}"><dt>${esc(k)}</dt><dd class="multiline">${esc(v)}</dd></div>`).join('')}
     </dl>`;
 
+  renderGoalMap(ws);
   renderTimetable('step2-timetable', ws, false);
   renderReferences(ws);
 
@@ -2761,6 +3181,39 @@ function renderStep2() {
   setActions('step2-actions', actions);
 
   requestAnimationFrame(drawStep2Charts);
+}
+
+function processChip(p) {
+  return `<span>P${p.order} ${esc(p.name || '（名称未設定）')}${p.category ? `〔${esc(p.category)}〕` : ''}</span>`;
+}
+
+function goalTypeTag(g) {
+  return g.type.trim() ? `<span class="goal-tag">${esc(g.type)}</span>` : '<span class="weak-tag">タイプ未設定</span>';
+}
+
+function renderGoalMap(ws) {
+  const el = document.getElementById('step2-goalmap');
+  const head = `<div class="ref-meta" style="margin-bottom:12px;">ゴール：<span style="color:var(--main3); font-weight:bold;">${esc(ws.goal || '未設定')}</span></div>`;
+  if (ws.stateGoals.length === 0) {
+    el.innerHTML = head + '<div class="note-empty">状態目標がまだありません。STEP1の基本情報で、ゴールに向けた状態目標を書くと、プロセスとのつながりを確かめられます。</div>';
+    return;
+  }
+  const items = ws.stateGoals.map(g => {
+    const linked = linkedProcesses(ws, g);
+    const minutes = linked.reduce((s, p) => s + p.duration + p.bufferAfter, 0);
+    return `
+      <div class="goal-map-item">
+        <div class="goal-map-head">${esc(goalLabel(ws, g))} ${goalTypeTag(g)}</div>
+        <div class="goal-map-procs">${linked.length ? linked.map(processChip).join('') : '<span style="border-style:dashed; color:var(--bad);">つながっているプロセスはありません</span>'}</div>
+        ${linked.length ? `<div class="ref-meta" style="margin-top:6px;">${linked.length}プロセス・合計 ${formatMinutes(minutes)}（バッファ込み）</div>` : ''}
+      </div>`;
+  }).join('');
+  const checks = goalChecks(ws);
+  const checksHtml = checks.length
+    ? `<ul class="goal-checks">${checks.map(c => `<li>${esc(c)}</li>`).join('')}</ul>`
+    : '<ul class="goal-checks"><li class="ok">すべての状態目標にプロセスがつながっています。</li></ul>';
+  el.innerHTML = head + items + checksHtml +
+    '<div class="engine-note" style="margin:12px 0 0;">確認は、選んだ項目（つながり・タイプ・発散／収束）だけで行っています。問題かどうかの判断は、設計者に委ねます。</div>';
 }
 
 // タイムテーブルの表示。withActual のときは STEP4 用に「予定」「実績」の2列にする
@@ -2862,6 +3315,7 @@ function renderStep3() {
   document.getElementById('overall-note').value = ws.overallNote;
   document.getElementById('next-action-note').value = ws.nextActionNote;
   renderEvalList();
+  renderGoalEvalList();
 
   if (ws.status === 'evaluated') {
     setActions('step3-actions', [{ label: '保存', primary: true, onClick: saveEvaluation }]);
@@ -3086,6 +3540,62 @@ function buildEvalCard(p, i) {
   return card;
 }
 
+// 状態目標ごとの達成度と、効いたプロセス（設計でつなげたかどうかに関係なく選べる）
+function renderGoalEvalList() {
+  const el = document.getElementById('goal-eval-list');
+  const ws = currentWS;
+  if (ws.stateGoals.length === 0) {
+    el.innerHTML = '<div class="neumorphic goal-eval-card"><div class="note-empty">状態目標が設定されていません。STEP1で書くと、ここで達成度と効いたプロセスを残せます。</div></div>';
+    return;
+  }
+  el.innerHTML = '';
+  ws.stateGoals.forEach(g => el.appendChild(buildGoalEvalCard(ws, g)));
+}
+
+function buildGoalEvalCard(ws, g) {
+  const ev = g.evaluation;
+  const linked = linkedProcesses(ws, g);
+  const card = document.createElement('div');
+  card.className = 'neumorphic goal-eval-card';
+  card.innerHTML = `
+    <div class="eval-header">
+      <div class="process-number">${goalKey(ws, g)}</div>
+      <div>
+        <div class="eval-process-name">${esc(g.text.trim() || '（内容未入力）')}</div>
+        ${goalTypeTag(g)}
+        <div class="eval-aim">設計でつなげたプロセス：${linked.length ? linked.map(p => `P${p.order} ${esc(p.name || '（名称未設定）')}`).join('、') : 'なし'}</div>
+      </div>
+    </div>
+    <div class="form-label">この状態目標は達成できた？</div>
+    <div class="ach-options">
+      ${ACHIEVEMENTS.map(a => `<button type="button" class="neumorphic-btn eval-option" data-ach="${a}">${ACHIEVEMENT_DISPLAY[a][1]}</button>`).join('')}
+    </div>
+    <div class="form-label">効いたプロセス（複数可）</div>
+    ${ws.processes.length
+      ? `<div class="chip-group">${ws.processes.map(p => `<button type="button" class="neumorphic-btn select-btn ${ev.effectiveProcessIds.includes(p.id) ? 'is-selected' : ''}" data-eff="${esc(p.id)}">P${p.order} ${esc(p.name || '（名称未設定）')}${p.stateGoalIds.includes(g.id) ? ' ★' : ''}</button>`).join('')}</div>
+         <div class="form-note">★＝設計でこの状態目標につなげたプロセス。つなげていないプロセスも選べます。</div>`
+      : '<div class="note-empty">プロセスがありません。</div>'}`;
+
+  const achButtons = card.querySelectorAll('[data-ach]');
+  const paint = () => achButtons.forEach(btn => {
+    btn.classList.remove('selected-ok', 'selected-good', 'selected-bad');
+    if (btn.dataset.ach === ev.achievement) btn.classList.add('selected-' + ACHIEVEMENT_DISPLAY[ev.achievement][0]);
+  });
+  paint();
+  achButtons.forEach(btn => btn.addEventListener('click', () => {
+    ev.achievement = ev.achievement === btn.dataset.ach ? '' : btn.dataset.ach;
+    touch();
+    paint();
+  }));
+  card.querySelectorAll('[data-eff]').forEach(btn => btn.addEventListener('click', () => {
+    const id = btn.dataset.eff;
+    ev.effectiveProcessIds = ev.effectiveProcessIds.includes(id) ? ev.effectiveProcessIds.filter(x => x !== id) : [...ev.effectiveProcessIds, id];
+    touch();
+    btn.classList.toggle('is-selected', ev.effectiveProcessIds.includes(id));
+  }));
+  return card;
+}
+
 // 入力内容は自動保存しているため、一時保存・保存は保存を確定させて知らせる
 function saveEvaluation() {
   touch();
@@ -3134,6 +3644,7 @@ function renderStep4() {
       <span class="result-badge bad">📉 予想より悪かった ${count('worse')}</span>
       <span class="result-badge none">未評価 ${count('')}</span>
     </div>`;
+  renderStep4Goals(ws);
   renderTimetable('step4-timetable', ws, true);
 
   const tbody = document.getElementById('compare-tbody');
@@ -3197,6 +3708,39 @@ function renderStep4() {
   requestAnimationFrame(drawStep4Charts);
 }
 
+// 状態目標ごとに「設計でつなげたプロセス（予想）」と「効いたプロセス（結果）」を並べる
+function renderStep4Goals(ws) {
+  const el = document.getElementById('step4-goals');
+  if (ws.stateGoals.length === 0) {
+    el.innerHTML = '<div class="note-empty">状態目標が設定されていません。</div>';
+    return;
+  }
+  const names = list => list.length ? list.map(p => `P${p.order} ${esc(p.name || '（名称未設定）')}`).join('、') : 'なし';
+  el.innerHTML = ws.stateGoals.map(g => {
+    const [cls, label] = ACHIEVEMENT_DISPLAY[g.evaluation.achievement];
+    const linked = linkedProcesses(ws, g);
+    const eff = ws.processes.filter(p => g.evaluation.effectiveProcessIds.includes(p.id));
+    const hit = linked.filter(p => eff.includes(p));
+    const extra = eff.filter(p => !linked.includes(p));
+    const miss = linked.filter(p => !eff.includes(p));
+    const facts = [];
+    if (eff.length > 0) {
+      if (hit.length) facts.push(`つなげたうち、効いた：${names(hit)}`);
+      if (extra.length) facts.push(`設計ではつなげていなかったが、効いた：${names(extra)}`);
+      if (miss.length) facts.push(`つなげたが、効いたプロセスに選ばれなかった：${names(miss)}`);
+    }
+    return `
+      <div class="goal-map-item">
+        <div class="goal-map-head">${esc(goalLabel(ws, g))} ${goalTypeTag(g)} <span class="result-badge ${cls}">${label}</span></div>
+        <dl class="overview-grid" style="margin-top:8px;">
+          <div class="overview-item"><dt>予想：設計でつなげたプロセス</dt><dd>${names(linked)}</dd></div>
+          <div class="overview-item"><dt>結果：効いたプロセス</dt><dd>${names(eff)}</dd></div>
+        </dl>
+        ${facts.length ? `<ul class="ref-facts">${facts.map(f => `<li>${f}</li>`).join('')}</ul>` : ''}
+      </div>`;
+  }).join('');
+}
+
 function drawStep4Charts() {
   drawUXChart('ux-chart-step4', currentWS, true);
   drawPieCharts(currentWS, 'step4');
@@ -3209,6 +3753,7 @@ function exportPayload(workshops) {
     exportedAt: nowIso(),
     workshops: deepCopy(workshops),
     categories: appData.categories.slice(),
+    goalTypes: appData.goalTypes.slice(),
   };
 }
 
@@ -3359,6 +3904,7 @@ function validateImportedProcess(p) {
     ['intervention', isStr, 'ファシリテーション・介入'],
     ['expectedReaction', isStr, '予想反応'],
     ['uxExpected', v => isUxMap(v, false), 'UX予想'],
+    ['stateGoalIds', v => Array.isArray(v) && v.every(isStr), 'つなげた状態目標'],
     ['evaluation', isPlainObject, '評価'],
   ]);
   if (err) return err;
@@ -3397,6 +3943,11 @@ function validateImportedWorkshop(raw) {
     ['createdAt', isIsoString, '作成日時'],
     ['uxAxes', v => Array.isArray(v) && v.length >= UX_AXES_MIN && v.length <= UX_AXES_MAX &&
       v.every(a => isPlainObject(a) && isStr(a.id) && a.id !== '' && isStr(a.label)), 'UXグラフ項目'],
+    ['stateGoals', v => Array.isArray(v) && v.length <= STATE_GOALS_MAX && v.every(g =>
+      isPlainObject(g) && isStr(g.id) && g.id !== '' && isStr(g.type) && isStr(g.text) &&
+      (!('evaluation' in g) || (isPlainObject(g.evaluation) &&
+        (!('achievement' in g.evaluation) || g.evaluation.achievement === '' || ACHIEVEMENTS.includes(g.evaluation.achievement)) &&
+        (!('effectiveProcessIds' in g.evaluation) || (Array.isArray(g.evaluation.effectiveProcessIds) && g.evaluation.effectiveProcessIds.every(isStr)))))), '状態目標'],
   ]);
   if (err) return err;
   for (let i = 0; i < raw.processes.length; i++) {
@@ -3421,7 +3972,7 @@ function importData(text) {
     return { error: `対応していない形式のバージョンです（このファイル: ${str(data.schemaVersion) || '不明'}、対応: ${SCHEMA_VERSION}）。` };
   }
 
-  const result = { added: 0, updated: 0, kept: 0, skipped: [], categoriesAdded: [] };
+  const result = { added: 0, updated: 0, kept: 0, skipped: [], categoriesAdded: [], goalTypesAdded: [] };
 
   // ファイル内で同じ id が重複していたら、更新日時が新しいものを使う
   const incoming = new Map();
@@ -3461,6 +4012,14 @@ function importData(text) {
       }
     });
   }
+  if (Array.isArray(data.goalTypes)) {
+    data.goalTypes.map(str).map(s => s.trim()).filter(Boolean).forEach(c => {
+      if (!appData.goalTypes.includes(c)) {
+        appData.goalTypes.push(c);
+        result.goalTypesAdded.push(c);
+      }
+    });
+  }
   result.saved = saveAppData();
   return result;
 }
@@ -3471,6 +4030,7 @@ function importResultMessage(r) {
   ];
   if (r.kept > 0) lines.push(`手元のほうが新しいか同じため、変更しなかったもの ${r.kept}件`);
   if (r.categoriesAdded.length) lines.push(`追加した種別：${r.categoriesAdded.join('、')}`);
+  if (r.goalTypesAdded.length) lines.push(`追加した状態目標のタイプ：${r.goalTypesAdded.join('、')}`);
   if (r.skipped.length) {
     lines.push('', 'スキップしたワークショップ（内容に不正な値があったもの）：');
     r.skipped.slice(0, 10).forEach(s => lines.push(`・${s.name}：${s.reason}`));
@@ -3584,6 +4144,8 @@ function recordRowHtml({ ws, p }) {
 // ===== ナレッジ画面（5-5） =====
 document.getElementById('btn-knowledge').addEventListener('click', () => showScreen('knowledge'));
 document.getElementById('btn-knowledge-home').addEventListener('click', () => showScreen('home'));
+document.getElementById('btn-about').addEventListener('click', () => showScreen('about'));
+document.getElementById('btn-about-home').addEventListener('click', () => showScreen('home'));
 document.getElementById('toggle-samples').addEventListener('change', e => {
   appData.settings.includeSamplesInStats = e.target.checked;
   saveAppData();
@@ -3613,6 +4175,8 @@ function renderKnowledge() {
     ? `<div class="form-note" style="margin:0 0 8px; padding:0;">UXグラフ項目ごとの「実際 − 予想」の平均。正の値は、実際のほうが高かったことを示します。同じ名前の項目どうしで集計しています。</div>
        <div class="bias-list">${bias.map(biasHtml).join('')}</div>`
     : '<div class="note-empty">UXの実際が入力された記録がまだありません。</div>';
+
+  renderKnowledgeGoals(workshops);
 
   const cats = categoryStats(workshops);
   const catEl = document.getElementById('knowledge-categories');
@@ -3646,6 +4210,56 @@ function renderKnowledge() {
 
   document.getElementById('knowledge-limit').textContent = ENGINE_LIMIT_NOTE;
   renderSearchResults();
+}
+
+function achDistHtml(s) {
+  if (s.achN === 0) return '<span class="stat-n">データなし</span>';
+  const seg = (count, color) => count ? `<span style="width:${(count / s.achN) * 100}%; background:${color};"></span>` : '';
+  return `達成 ${s.dist.achieved} ／ 一部 ${s.dist.partial} ／ できず ${s.dist.not}${nNote(s.achN)}
+    <div class="dist-bar" aria-hidden="true">${seg(s.dist.achieved, 'var(--good)')}${seg(s.dist.partial, 'var(--main1)')}${seg(s.dist.not, 'var(--bad)')}</div>`;
+}
+
+function goalRecordRowHtml({ ws, g }) {
+  const [cls, label] = ACHIEVEMENT_DISPLAY[g.evaluation.achievement];
+  return `
+    <button type="button" class="record-row" data-open-ws="${esc(ws.id)}">
+      <strong>${esc(g.text || '（内容未入力）')}</strong>
+      <span class="stat-n">${esc(ws.name || '無題のワークショップ')}・${esc(ws.date || '日付未設定')}</span>
+      <span class="result-badge ${cls}">${label}</span>
+    </button>`;
+}
+
+function renderKnowledgeGoals(workshops) {
+  const el = document.getElementById('knowledge-goals');
+  const stats = goalTypeStats(workshops);
+  if (stats.length === 0) {
+    el.innerHTML = '<div class="note-empty">タイプ付きの状態目標の記録はまだありません。</div>';
+    return;
+  }
+  el.innerHTML = stats.map((c, i) => `
+    <div class="neumorphic stat-card">
+      <div class="stat-card-head">
+        <span class="stat-card-title">${esc(c.type)}</span>
+        <span class="stat-n">記録 ${c.summary.total}件・${c.summary.workshopCount}回のワークショップ</span>
+      </div>
+      <dl class="stat-grid">
+        <div class="stat-item"><dt>達成度の分布</dt><dd>${achDistHtml(c.summary)}</dd></div>
+        <div class="stat-item" style="grid-column: 1 / -1;"><dt>効いたプロセス（種別ごと・多い順）</dt><dd>${effectiveListHtml(c.summary.effective)}</dd></div>
+      </dl>
+      <button type="button" class="link-btn" data-toggle-goal-records="${i}">このタイプの記録を見る（${c.summary.total}件）</button>
+      <div class="record-list" hidden></div>
+    </div>`).join('');
+  el.querySelectorAll('[data-toggle-goal-records]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const list = btn.nextElementSibling;
+      if (list.hidden && !list.innerHTML) {
+        const c = stats[Number(btn.dataset.toggleGoalRecords)];
+        list.innerHTML = c.records.slice().sort((a, b) => compareByDateDesc(a.ws, b.ws)).map(goalRecordRowHtml).join('');
+        bindOpenLinks(list);
+      }
+      list.hidden = !list.hidden;
+    });
+  });
 }
 
 const SEARCH_RESULT_LIMIT = 50;
@@ -3684,13 +4298,48 @@ function renderSearchResults() {
 // ===== STEP2 過去の記録からの参考情報（7-6） =====
 const R5_EXCERPT_LENGTH = 80;
 
+function goalReferencesHtml(ws) {
+  if (ws.stateGoals.length === 0) {
+    return '<div class="ref-meta">状態目標を書くと、同じタイプの状態目標に過去どのプロセスが効いたかが表示されます。</div>';
+  }
+  return ws.stateGoals.map(g => {
+    const ref = pastGoalReferenceFor(g, ws);
+    let body;
+    if (ref.state === 'no-type') {
+      body = '<div class="ref-meta">タイプを設定すると、過去の記録が表示されます</div>';
+    } else if (ref.state === 'no-data') {
+      body = '<div class="ref-meta">このタイプの過去の記録はまだありません</div>';
+    } else {
+      const facts = ref.facts.length ? `<ul class="ref-facts">${ref.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : '';
+      const recs = ref.records.slice().sort((a, b) => compareByDateDesc(a.ws, b.ws)).slice(0, 3).map(({ ws: w, g: pg }) => {
+        const [cls, label] = ACHIEVEMENT_DISPLAY[pg.evaluation.achievement];
+        return `<div class="ref-quote"><span class="multiline">「${esc(pg.text || '（内容未入力）')}」</span>
+          <span class="ref-meta">— ${esc(w.name || '無題のワークショップ')}・${esc(w.date || '日付未設定')} <span class="result-badge ${cls}">${label}</span><button type="button" class="link-btn" data-open-ws="${esc(w.id)}">記録を開く</button></span></div>`;
+      }).join('');
+      body = `
+        <div class="ref-meta">同じタイプの過去の状態目標 ${ref.s.total}件（${ref.s.workshopCount}回のワークショップ）${ref.s.total < CONFIG.minReliableN ? '<span class="weak-tag">参考（件数が少ない）</span>' : ''}</div>
+        ${facts}
+        <div class="stat-sub-title" style="margin-top:8px;">効いたプロセス（種別ごと・多い順）</div>
+        <div class="bias-list">${effectiveListHtml(ref.s.effective)}</div>
+        ${recs}`;
+    }
+    return `
+      <div class="ref-block">
+        <div class="ref-title">${esc(goalLabel(ws, g))}${g.type ? `<span class="goal-tag" style="margin-left:6px;">${esc(g.type)}</span>` : ''}</div>
+        ${body}
+      </div>`;
+  }).join('');
+}
+
 function renderReferences(ws) {
   const el = document.getElementById('step2-references');
+  const sampleIncluded = appData.settings.includeSamplesInStats && statsWorkshops(ws.id).some(w => w.isSample);
+  const goalSection = `<div class="ref-subtitle">状態目標ごと（同じタイプの過去の記録）</div>${goalReferencesHtml(ws)}`;
   if (ws.processes.length === 0) {
-    el.innerHTML = '<div class="note-empty">プロセスを追加すると、同じ種別の過去の記録が表示されます。</div>';
+    el.innerHTML = goalSection + '<div class="ref-subtitle">プロセスごと（同じ種別の過去の記録）</div><div class="note-empty">プロセスを追加すると、同じ種別の過去の記録が表示されます。</div>';
+    bindOpenLinks(el);
     return;
   }
-  const sampleIncluded = appData.settings.includeSamplesInStats && statsWorkshops(ws.id).some(w => w.isSample);
 
   const blocks = ws.processes.map((p, i) => {
     const ref = pastReferenceFor(p, ws);
@@ -3720,6 +4369,8 @@ function renderReferences(ws) {
 
   el.innerHTML =
     (sampleIncluded ? '<div class="banner info" style="margin-bottom:12px;">サンプルを含む集計です。</div>' : '') +
+    goalSection +
+    '<div class="ref-subtitle">プロセスごと（同じ種別の過去の記録）</div>' +
     blocks +
     `<div class="engine-note" style="margin-bottom:0;">${esc(ENGINE_LIMIT_NOTE)}</div>`;
   bindOpenLinks(el);
